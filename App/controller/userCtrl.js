@@ -56,7 +56,7 @@ import User from "../models/user-model.js";
        res.json({token:`Bearer ${token}`})
     }catch(err){
         console.log(err)
-        res.status(500).json({error:'something went wrong'})
+        res.status(500).json({error:'something went wrongg'})
     }
  }
  userCtrl.account=async(req,res)=>{

@@ -3,16 +3,13 @@ const userSchema=new Schema({
     name:String,
     email:String,
     password:String,
+    phone:String,
+    location:{city:String,state:String},
     role:{
         type:String,
         enum:['vendor','client','admin']
-    },
-    status:{
-        type:String,
-        enum:["active","inactive"],
-        default:"active"
-    },
+    }
     
-},{timeStamps:true})
+},{timestamps:true})
 const User=model('User',userSchema)
 export default User

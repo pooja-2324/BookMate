@@ -2,6 +2,16 @@ import User from "../models/user-model.js";
 
 
 export const userRegisterSchema={
+    name:{
+        in:['body'],
+        exists:{
+            errorMessage:'name field is required'
+        },
+        notEmpty:{
+            errorMessage:'name field cannot be empty'
+        },
+        trim:true
+    },
     email:{
         in:['body'],
         exists:{
@@ -49,13 +59,37 @@ export const userRegisterSchema={
 
         }
     },
-    name:{
+    role: {
+        in: ['body'],
+        custom: {
+            options: async function (value) {
+                const count = await User.countDocuments();
+                if (count === 0) {
+                    return true
+                } else if (!value) {
+                    throw new Error('role field is required')
+                }
+                return true;
+            }
+        }
+    },
+    location:{
         in:['body'],
         exists:{
-            errorMessage:'name field is required'
+            errorMessage:'location is required'
         },
         notEmpty:{
-            errorMessage:'name field cannot be empty'
+            errorMessage:'location cannot be empty'
+        },
+        options:{
+            custom:async function(value){
+                if(!value.city||!value.state){
+                    throw new Error('loaction city and state field is required')
+                }
+                return true
+            }
         }
+
     }
+    
 }
