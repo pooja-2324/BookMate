@@ -11,5 +11,17 @@ vendorCtrl.allVendors=async(req,res)=>{
         res.status(500).json({error:'something went wrong'})
     }
 }
+vendorCtrl.oneVendor=async(req,res)=>{
+    try{
+        const id=req.params.id
+        const vendor=await User.findById(id)
+        if(!vendor){
+            return res.status(404).json({error:'vendor not found'})
+        }
+        res.json(vendor)
+    }catch(err){
+        res.status(500).json({error:'something went wrong'})
+    }
+}
 
 export default vendorCtrl

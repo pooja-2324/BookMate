@@ -1,5 +1,10 @@
 import bcryptjs from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import twilio from 'twilio'
+import axios from 'axios'
+import crypto from "crypto"
+import dotenv from 'dotenv'
+dotenv.config()
 import { validationResult } from 'express-validator';
 import User from "../models/user-model.js";
  const userCtrl={}
@@ -36,7 +41,7 @@ import User from "../models/user-model.js";
     try{
         const body=req.body
         const user=await User.findOne({email:body.email})
-        console.log('user',user)
+        
 
         if(!user){
             return res.status(404).json({error:'invalid email/password'})
@@ -46,19 +51,65 @@ import User from "../models/user-model.js";
 
        }
        const isValidate= bcryptjs.compare(body.password,user.password)
-       console.log('isValidate',isValidate)
+       
        if(!isValidate){
         return res.status(400).json({error:'invalid email/password'})
        }
 
        const token=jwt.sign({userId:user._id,role:user.role},process.env.JWT_SECRET,{expiresIn:'7d'})
-       console.log('token',token)
+    
        res.json({token:`Bearer ${token}`})
     }catch(err){
         console.log(err)
         res.status(500).json({error:'something went wrongg'})
     }
  }
+
+userCtrl.getOtp=async(req,res)=>{
+    try{
+        const {phone} =req.body
+        const otp = Math.floor(100000 + Math.random() * 900000).toString()
+        const client = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
+        await client.messages.create({
+            body: `Your OTP is ${otp}`,
+            from: process.env.TWILIO_PHONE_NUMBER, // Twilio phone number
+            to: phone // User's phone number
+        });
+
+        // Store OTP and its expiration in the session
+        req.session.otp = otp;
+        req.session.otpExpiry = Date.now() + 5 * 60 * 1000; // 5 minutes
+
+        res.json({ message: 'OTP sent successfully' });
+    }catch(err){
+        console.log(err)
+        res.status(500).json({error:'something wnet wrong'})
+
+    }
+}
+userCtrl.verifyOtp=async(req,res)=>{
+    const {otp,phone}=req.body
+    console.log('session',req.session.otp)
+
+    if (req.session.otp !== otp) {
+        return res.status(400).json({ error: 'Invalid OTP' });
+    }
+
+    if (Date.now() > req.session.otpExpiry) {
+        return res.status(400).json({ error: 'OTP has expired' });
+    }
+
+    // Proceed with generating JWT token or other logic
+    const user = await User.findOne({ phone });
+    if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+    }
+
+    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+    res.json({ token: `Bearer ${token}` });
+}
+
  userCtrl.account=async(req,res)=>{
     try{
         const user=await User.findById(req.currentUser.userId)

@@ -9,14 +9,15 @@ export const bookCreateSchema={
         notEmpty:{
             errorMessage:'title field cannot be empty'
         },
-        // options:{
-        //     custom:async function(value){
-        //         const books=await Book.find({vendor:req.currentUser.userId,title:value})
-        //         if(books){
-        //             throw new Error ('book is already uploaded')
-        //         }
-        //     }
-        // }
+        custom: {
+            options: async (value, { req }) => {
+                const books = await Book.findOne({ vendor: req.currentUser.userId, title: value });
+                if (books) {
+                    throw new Error('book is already uploaded');
+                }
+                return true;
+            }
+        }
     },
     description:{
         in:['body'],

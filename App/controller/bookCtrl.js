@@ -2,11 +2,13 @@ import _ from 'lodash'
 import Book from "../models/book-model.js";
 import { validationResult } from 'express-validator';
 import axios from 'axios'
+import User from '../models/user-model.js';
 
 const bookCtrl={}
 
 bookCtrl.create=async(req,res)=>{
     const errors=validationResult(req)
+  
     if(!errors.isEmpty()){
         return res.status(400).json({error:errors.array()})
     }
@@ -14,6 +16,7 @@ bookCtrl.create=async(req,res)=>{
         const body=req.body
         const response=await axios.get(`https://openlibrary.org/search.json?title=${body.title}`)
         body.vendor=req.currentUser.userId
+        body.modifiedTitle=response.data.docs[0].title
         body.author=response.data.docs[0].author_name[0]
         body.pages=response.data.docs[0].number_of_pages_median
         body.genre=response.data.docs[0].subject_facet
@@ -96,6 +99,35 @@ bookCtrl.verify=async(req,res)=>{
     }catch(err){
     console.log(err)
     res.status(500).json({error:'something went wrong'})
+    }
+}
+bookCtrl.oneBook=async(req,res)=>{
+    try{
+        const id=req.params.id
+        const book=await Book.findById(id)
+        if(!book){
+            return res.status(404).json({error:'book not found'})
+        }
+        res.json(book)
+    }catch(err){
+        res.status(500).json({error:'something went wrong'})
+    }
+}
+bookCtrl.specific=async(req,res)=>{
+    try{
+        const {vid,bid} =req.params
+        const vendor=await User.findById(vid)
+        if(!vendor){
+            return res.status(404).json({error:'vendor not found'})
+        }
+        const book=await Book.findOne({vendor:vid,_id:bid})
+        if(!book){
+            return res.status(404).json({error:'book not found'})
+        }
+        res.json(book)
+    }catch(err){
+        console.log(err)
+        res.status(500).json({error:'something went wrong'})
     }
 }
 

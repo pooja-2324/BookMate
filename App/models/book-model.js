@@ -1,6 +1,7 @@
 import {Schema,model} from 'mongoose'
 const bookSchema=new Schema({
     title:String,
+    modifiedTitle:String,
     author:String,
     pages:Number,
     genre:Array,
