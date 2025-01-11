@@ -1,8 +1,8 @@
 import bcryptjs from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import twilio from 'twilio'
-import axios from 'axios'
-import crypto from "crypto"
+import Client from '../models/client-model.js'
+import Vendor from '../models/vendor-model.js'
 import dotenv from 'dotenv'
 dotenv.config()
 import { validationResult } from 'express-validator';
@@ -27,6 +27,25 @@ import User from "../models/user-model.js";
             user.role='admin'
         }
         await user.save()
+        if (body.role === 'client') {
+            const client=new Client({
+                client: user._id,
+                wallet: 0, 
+                rentedBooks: [],
+                purchasedBooks: [],
+                reviews:[]
+            });
+            await client.save();
+        }
+        else if (body.role === 'vendor') {
+            const vendor=new Vendor({
+                vendor: user._id,
+                uploadedBooks: [],
+                totalEarnings: 0,
+                reviews:[]
+            });
+            await vendor.save();
+        }
         res.status(201).json(user)
 
 
@@ -76,7 +95,7 @@ userCtrl.getOtp=async(req,res)=>{
             to: phone // User's phone number
         });
 
-        // Store OTP and its expiration in the session
+        
         req.session.otp = otp;
         req.session.otpExpiry = Date.now() + 5 * 60 * 1000; // 5 minutes
 

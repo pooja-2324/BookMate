@@ -14,23 +14,28 @@ const rentSchema=new Schema({
          },
     rentalStartDate:{
           type:Date,
-          default:Date.now()
+          default:new Date()
          },
+    period:Number,
     dueDate:Date,
     returnedDate:Date,
-    status:{
+    rentedBookStatus:{
           type:String,
           enum:["active","completed","late"]
          },
+
     pricing:{
           cautionDeposit:Number,
           readingFee:Number,
           deliveryFee:Number,
-          lateFee:Number,
-          damageFee:Number,
+          
           platformFee:Number 
          },
-    totalAmountToPay:Number //cautionDeposit + readingFee + platformFee + deliveryFee
+         lateFee:Number,
+          damageFee:Number,
+    totalAmountToPay:Number ,//cautionDeposit + readingFee + platformFee + deliveryFee
+    isDamaged:Boolean
+
         
 },{timeStamps:true})
 

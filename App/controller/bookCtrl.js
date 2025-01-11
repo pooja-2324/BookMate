@@ -3,6 +3,7 @@ import Book from "../models/book-model.js";
 import { validationResult } from 'express-validator';
 import axios from 'axios'
 import User from '../models/user-model.js';
+import Vendor from '../models/vendor-model.js';
 
 const bookCtrl={}
 
@@ -15,6 +16,9 @@ bookCtrl.create=async(req,res)=>{
     try{
         const body=req.body
         const response=await axios.get(`https://openlibrary.org/search.json?title=${body.title}`)
+        if (!response.data.docs || response.data.docs.length === 0) {
+            return res.status(404).json({ error: 'Book not found in Open Library database' });
+        }
         body.vendor=req.currentUser.userId
         body.modifiedTitle=response.data.docs[0].title
         body.author=response.data.docs[0].author_name[0]
@@ -26,6 +30,14 @@ bookCtrl.create=async(req,res)=>{
         const cover=response.data.docs[0].cover_i
         body.coverImage=`https://covers.openlibrary.org/b/id/${cover}-L.jpg`
         const book=new Book(body)
+        
+        const vendor = await Vendor.findOne({vendor:req.currentUser.userId});
+        console.log('vendor',vendor)
+        if (!vendor) {
+            return res.status(404).json({ error: 'Vendor not found' });
+        }
+        vendor.uploadedBooks.push(book._id)
+        await vendor.save()
         await book.save()
         res.status(201).json(book)
         
@@ -39,6 +51,19 @@ bookCtrl.allBooks=async(req,res)=>{
         const books=await Book.find()
         res.json(books)
     }catch(err){
+        res.status(500).json({error:'something went wrong'})
+    }
+}
+bookCtrl.verified=async(req,res)=>{
+    try{
+        const books=await Book.find({isVerified:true})
+        if(!books){
+            return res.status(400).json({error:'no books verified'})
+        }
+        res.json(books)
+
+    }catch(err){
+        console.log(err)
         res.status(500).json({error:'something went wrong'})
     }
 }

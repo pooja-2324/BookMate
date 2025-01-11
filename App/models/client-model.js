@@ -26,10 +26,10 @@ const clientSchema=new Schema({
         }
     }],
     wallet:Number,
-    reviews:{
+    reviews:[{
         type:Schema.Types.ObjectId,
         ref:"Review"
-    }
+    }]
 
 },{timestamps:true})
 const Client=model('Client',clientSchema)

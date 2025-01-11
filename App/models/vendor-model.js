@@ -1,15 +1,15 @@
 import {Schema,model} from 'mongoose'
 const vendorSchema=new Schema({
-    vendorId:{
+    vendor:{
         type:Schema.Types.ObjectId,
         ref:'User'
     },
     uploadedBooks:[{type:Schema.Types.ObjectId,ref:'Book'}],
     totalEarnings:Number,
-    reviews:{
+    reviews:[{
         type:Schema.Types.ObjectId,
         ref:'Review'
-    }
+    }]
 
 
 },{timestamps:true})

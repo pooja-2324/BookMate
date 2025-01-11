@@ -2,7 +2,7 @@ import {Schema,model} from 'mongoose'
 const reviewSchema=new Schema({
     reviewFor:{
         type:String,
-        enum:['client','vendor','book']
+        enum:['Client','Vendor','Book']
     },
     reviewBy:{
         type:Schema.Types.ObjectId,
@@ -14,9 +14,13 @@ const reviewSchema=new Schema({
         min:1,
         max:5
     },
-    reviwedAt:{
+    reviewedAt:{
         type:Date,
-        Date:Date.now()
+        default:Date.now()
+    },
+    reviewEntityId:{
+        type:Schema.Types.ObjectId,
+        refPath:'reviewFor'
     }
 
 },{timestamps:true})

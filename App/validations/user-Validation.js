@@ -82,7 +82,7 @@ export const userRegisterSchema={
             errorMessage:'location cannot be empty'
         },
         options:{
-            custom:async function(value){
+            custom: function(value){
                 if(!value.city||!value.state){
                     throw new Error('loaction city and state field is required')
                 }
@@ -90,6 +90,82 @@ export const userRegisterSchema={
             }
         }
 
+    },
+    phone:{
+        in:['body'],
+        exists:{
+            errorMessage:'phone field is required'
+        },
+        notEmpty:{
+            errorMessage:'phone field cannot be empty'
+        },
+        custom:{
+            options:async function(value) {
+                const phoneRegex = /^[0-9]{10}$/;
+                return phoneRegex.test(value)
+            },
+            errorMessage:'ivalid phoneNumber format'
+        }
     }
     
+}
+export const userLoginSchema={
+    email:{
+        in:['body'],
+        exists:{
+            errorMessage:'email field is required'
+        },
+        notEmpty:{
+            errorMessage:'email field cannot be empty'
+        },
+        isEmail:{
+            errorMessage:'email should be in valid format'
+        },
+        normalizeEmail:true,
+        trim:true
+    },
+    password:{
+        in:['body'],
+        exists:{
+            errorMessage:'password field is required'
+        },
+        notEmpty:{
+            errorMessage:'password field cannot be empty'
+        },
+        trim:true
+    }
+}
+export const getOtpSchema={
+    phone:{
+        in:['body'],
+        exists:{
+            errorMessage:'phone field is required'
+        },
+        notEmpty:{
+            errorMessage:'phone field cannot be empty'
+        },
+        trim:true
+    }
+}
+export const verifyOtpSchema={
+    phone:{
+        in:['body'],
+        exists:{
+            errorMessage:'phone field is required'
+        },
+        notEmpty:{
+            errorMessage:'phone field cannot be empty'
+        },
+        trim:true
+    },
+    otp:{
+        in:['body'],
+        exists:{
+            errorMessage:'otp field is required'
+        },
+        notEmpty:{
+            errorMessage:'otp field cannot be empty'
+        },
+        trim:true
+    }
 }
