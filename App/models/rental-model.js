@@ -28,13 +28,17 @@ const rentSchema=new Schema({
           cautionDeposit:Number,
           readingFee:Number,
           deliveryFee:Number,
-          
           platformFee:Number 
          },
          lateFee:Number,
           damageFee:Number,
-    totalAmountToPay:Number ,//cautionDeposit + readingFee + platformFee + deliveryFee
-    isDamaged:Boolean
+      totalAmountToPay:Number ,//cautionDeposit + readingFee + platformFee + deliveryFee
+      isDamaged:Boolean,
+      deliveryStatus:{
+            type:String,
+            default:'order placed',
+            enum:['order placed','delivered']
+      }
 
         
 },{timeStamps:true})

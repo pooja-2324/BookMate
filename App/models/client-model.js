@@ -19,7 +19,7 @@ const clientSchema=new Schema({
             type:Schema.Types.ObjectId,
             ref:"Book"
         },
-        purchasingDetails:{
+        buyingDetails:{
             type:Schema.Types.ObjectId,
             ref:'Sell'
 

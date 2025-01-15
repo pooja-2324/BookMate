@@ -19,6 +19,7 @@ import bookCtrl from "./App/controller/bookCtrl.js"
 import rentCtrl from "./App/controller/rentCtrl.js"
 import reviewCtrl from "./App/controller/reviewCtrl.js"
 import clientCtrl from "./App/controller/clientCTrl.js"
+import buyCtrl from "./App/controller/buyCtrl.js"
 
 import { userRegisterSchema } from "./App/validations/user-Validation.js"
 import { userLoginSchema } from "./App/validations/user-Validation.js"
@@ -29,6 +30,7 @@ import { idValidationSchema } from "./App/validations/idValidationSchema.js"
 import { bookCreateSchema } from "./App/validations/book-validation.js"
 
 import { rentDetailsSchema } from "./App/validations/rent-Validation.js"
+import { buyValidationSchema } from "./App/validations/buyValidation.js"
 
 const app=express()
 app.use(express.json())
@@ -65,6 +67,9 @@ app.put('/api/rent/:rid/return',AuthenticateUser,AuthorizeUser(['client']),rentC
 app.post('/api/review/create',AuthenticateUser,reviewCtrl.create)
 
 app.get('/api/client/allClients',clientCtrl.allClients)
+
+app.post('/api/buy/create',AuthenticateUser,AuthorizeUser(['vendor']),checkSchema(buyValidationSchema),buyCtrl.details)
+app.put('/api/buy/:bid/placeOrder',AuthenticateUser,AuthorizeUser(['client']),buyCtrl.placeOrder)
 
 app.listen(process.env.PORT,()=>{
     console.log('server is listening on port',process.env.PORT)
