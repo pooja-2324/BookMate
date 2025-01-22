@@ -156,5 +156,17 @@ bookCtrl.specific=async(req,res)=>{
     }
 }
 
-
+bookCtrl.myBooks=async(req,res)=>{
+    try{
+        const user=req.currentUser.userId
+        const response=await Book.find({vendor:user})
+        if (response.length === 0) {
+            return res.status(404).json({ error: 'No books found for this vendor' });
+        }
+        res.json(response)
+    }catch(err){
+        console.log(err)
+        res.status(500).json({error:'something went wrong'})
+    }
+}
 export default bookCtrl

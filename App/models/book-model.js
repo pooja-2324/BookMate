@@ -22,6 +22,11 @@ const bookSchema=new Schema({
         
     },
     description:String,
+    isApproved:{
+        type:Boolean,
+        default:false
+    },
+    isSelling:Boolean,
     coverImage:String,//open book api
     vendor:{
         type:Schema.Types.ObjectId,

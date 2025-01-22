@@ -59,7 +59,6 @@ rentCtrl.placeOrder=async(req,res)=>{
                 }
             }
         });
-
         
         await Vendor.findOneAndUpdate({vendor:rent.vendor}, {
             $inc: { totalEarnings: rent.pricing.readingFee }

@@ -4,6 +4,10 @@ const vendorSchema=new Schema({
         type:Schema.Types.ObjectId,
         ref:'User'
     },
+    isApproved:{
+        type:Boolean,
+        default:false
+    },
     uploadedBooks:[{type:Schema.Types.ObjectId,ref:'Book'}],
     totalEarnings:Number,
     reviews:[{

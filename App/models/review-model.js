@@ -2,7 +2,7 @@ import {Schema,model} from 'mongoose'
 const reviewSchema=new Schema({
     reviewFor:{
         type:String,
-        enum:['Client','Vendor','Book']
+        enum:['Client','Book']
     },
     reviewBy:{
         type:Schema.Types.ObjectId,

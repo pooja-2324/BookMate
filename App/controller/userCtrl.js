@@ -4,10 +4,21 @@ import twilio from 'twilio'
 import Client from '../models/client-model.js'
 import Vendor from '../models/vendor-model.js'
 import dotenv from 'dotenv'
+import upload from "../middleware/multer.js"
 dotenv.config()
 import { validationResult } from 'express-validator';
 import User from "../models/user-model.js";
  const userCtrl={}
+
+userCtrl.count=async(req,res)=>{
+    try{
+        const count=await User.countDocuments()
+        res.json({count})
+    }catch(err){
+        console.log(err)
+        res.status(500).json({error:'error fetching count'})
+    }
+}
 
  userCtrl.register=async(req,res)=>{
     const errors=validationResult(req)
@@ -141,5 +152,34 @@ userCtrl.verifyOtp=async(req,res)=>{
         res.status(500).json({error:'something went wrong'})
     }
  }
+ 
+ userCtrl.updateProfilePic = async (req, res) => {
+    
+        try {
+            const user = await User.findById(req.currentUser.userId);
+            if (!user) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
+            if (user.profilePic && user.profilePic !== 'profile pic default.jpg') {
+                const oldPicPath = path.join('uploads',user.profilePic);
+                if (fs.existsSync(oldPicPath)) {
+                    fs.unlinkSync(oldPicPath);  // Delete the old profile picture
+                }
+            }
+
+            user.profilePic = req.file.filename;  // Store the new image filename
+            await user.save();
+
+            res.status(201).json({
+                message: 'Profile picture updated successfully',
+                profilePic: user.profilePic  // Return the new profile picture filename
+            });
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ error: 'Something went wrong' });
+        }
+    }
+
 
  export default userCtrl

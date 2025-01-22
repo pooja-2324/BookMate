@@ -11,9 +11,10 @@ const userSchema=new Schema({
         type:String,
         enum:['vendor','client','admin']
     },
-    status:{
+   
+    profilePic:{
         type:String,
-        default:'active'
+        default:'profile pic default.jpg'
     }
     
 },{timestamps:true})
