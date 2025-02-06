@@ -22,10 +22,7 @@ const bookSchema=new Schema({
         
     },
     description:String,
-    isApproved:{
-        type:Boolean,
-        default:false
-    },
+   
     isSelling:Boolean,
     coverImage:String,//open book api
     vendor:{
@@ -35,7 +32,8 @@ const bookSchema=new Schema({
     reviews:[{
         type:Schema.Types.ObjectId,
         ref:'Review'
-    }]
+    }],
+    rentCount:Number
 },{timestamps:true})
 
 const Book=model('Book',bookSchema)

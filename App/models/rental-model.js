@@ -16,6 +16,7 @@ const rentSchema=new Schema({
           type:Date,
           default:new Date()
          },
+      rentalEndDate:Date,
     period:Number,
     dueDate:Date,
     returnedDate:Date,
@@ -36,8 +37,11 @@ const rentSchema=new Schema({
       isDamaged:Boolean,
       deliveryStatus:{
             type:String,
-            default:'order placed',
             enum:['order placed','delivered']
+      },
+      updatedAt:{
+            type:Date,
+            default:new Date()
       }
 
         

@@ -21,7 +21,8 @@ const reviewSchema=new Schema({
     reviewEntityId:{
         type:Schema.Types.ObjectId,
         refPath:'reviewFor'
-    }
+    },
+    photo:String
 
 },{timestamps:true})
 const Review=model('Review',reviewSchema)

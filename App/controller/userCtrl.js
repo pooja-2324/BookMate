@@ -52,7 +52,7 @@ userCtrl.count=async(req,res)=>{
             const vendor=new Vendor({
                 vendor: user._id,
                 uploadedBooks: [],
-                totalEarnings: 0,
+                totalEarnings: [],
                 reviews:[]
             });
             await vendor.save();
@@ -80,7 +80,7 @@ userCtrl.count=async(req,res)=>{
         return res.status(400).json({error:'your account is deactivated ,please contact admin'})
 
        }
-       const isValidate= bcryptjs.compare(body.password,user.password)
+       const isValidate= await bcryptjs.compare(body.password,user.password)
        
        if(!isValidate){
         return res.status(400).json({error:'invalid email/password'})

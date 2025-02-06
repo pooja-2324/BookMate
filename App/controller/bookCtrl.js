@@ -4,6 +4,7 @@ import { validationResult } from 'express-validator';
 import axios from 'axios'
 import User from '../models/user-model.js';
 import Vendor from '../models/vendor-model.js';
+import Rent from '../models/rental-model.js';
 
 const bookCtrl={}
 
@@ -49,7 +50,7 @@ bookCtrl.create=async(req,res)=>{
 bookCtrl.allBooks=async(req,res)=>{
     try{
         const books=await Book.find()
-        res.json(books)
+        res.json([books])
     }catch(err){
         res.status(500).json({error:'something went wrong'})
     }
@@ -102,6 +103,17 @@ bookCtrl.withdraw=async(req,res)=>{
        if(!book){
         return res.status(404).json({error:'book not found'})
        }
+       const vendor = await Vendor.findOne({vendor:req.currentUser.userId});
+        console.log('vendor',vendor)
+        if (!vendor) {
+            return res.status(404).json({ error: 'Vendor not found' });
+        }
+        // vendor.uploadedBooks.push(book._id)
+        // await vendor.save()
+       const bookIndex=await Book.findIndex(ele=>ele._id==id)
+       console.log('bookIndex',bookIndex)
+       vendor.splice(bookIndex,1)
+       await vendor.save()
        res.json({deletesuccessfully:book})
     }catch(err){
         console.log(err)
@@ -159,8 +171,9 @@ bookCtrl.specific=async(req,res)=>{
 bookCtrl.myBooks=async(req,res)=>{
     try{
         const user=req.currentUser.userId
+        console.log('user',user)
         const response=await Book.find({vendor:user})
-        if (response.length === 0) {
+        if (!response) {
             return res.status(404).json({ error: 'No books found for this vendor' });
         }
         res.json(response)
@@ -169,4 +182,5 @@ bookCtrl.myBooks=async(req,res)=>{
         res.status(500).json({error:'something went wrong'})
     }
 }
+
 export default bookCtrl

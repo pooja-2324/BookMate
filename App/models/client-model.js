@@ -9,9 +9,9 @@ const clientSchema=new Schema({
             type:Schema.Types.ObjectId,
             ref:'Book'
         },
-        rentDetails:{
+        rent:{
             type:Schema.Types.ObjectId,
-            ref:"Rental"
+            ref:"Rent"
         }  
     }],
     purchasedBooks:[{

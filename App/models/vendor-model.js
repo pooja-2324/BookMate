@@ -9,11 +9,17 @@ const vendorSchema=new Schema({
         default:false
     },
     uploadedBooks:[{type:Schema.Types.ObjectId,ref:'Book'}],
-    totalEarnings:Number,
-    reviews:[{
+    totalEarnings:[{
+        book:{
         type:Schema.Types.ObjectId,
-        ref:'Review'
-    }]
+        ref:'Book'
+    },
+    earnings:Number
+        }],
+    // reviews:[{
+    //     type:Schema.Types.ObjectId,
+    //     ref:'Review'
+    // }]
 
 
 },{timestamps:true})

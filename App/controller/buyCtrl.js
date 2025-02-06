@@ -61,7 +61,12 @@ import { validationResult } from "express-validator";
             }
         })
         await Vendor.findOneAndUpdate({vendor:buy.vendor}, {
-            $inc: { totalEarnings: buy.sellingPrice }
+            $push: {
+                totalEarnings: {
+                  book: rent.book._id,
+                  earnings: rent.pricing.readingFee,
+                },
+              },
         });
         res.json({message:'order placed successfully'})
     }catch(err){

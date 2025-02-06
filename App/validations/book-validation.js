@@ -47,13 +47,53 @@ export const bookCreateSchema={
         }
 
     },
-    sellPrice:{
+    // sellPrice:{
+    //     in:['body'],
+    //     exists:{
+    //         errorMessage:'SellPrice is required'
+    //     },
+    //     notEmpty:{
+    //         errorMessage:'SellPrice cannot be empty'
+    //     }
+
+    // }
+}
+export const bookUpdateSchema={
+    title:{
         in:['body'],
         exists:{
-            errorMessage:'SellPrice is required'
+            errorMessage:'title is required'
         },
         notEmpty:{
-            errorMessage:'SellPrice cannot be empty'
+            errorMessage:'title field cannot be empty'
+        },
+        
+    },
+    description:{
+        in:['body'],
+        exists:{
+            errorMessage:'description field is required'
+        },
+        notEmpty:{
+            errorMessage:'description field cannot be empty'
+        }
+    },
+    condition:{
+        in:['body'],
+        exists:{
+            errorMessage:'condition is required'
+        },
+        notEmpty:{
+            errorMessage:'condition cannot be empty'
+        }
+    },
+    rentPrice:{
+        in:['body'],
+        exists:{
+            errorMessage:'RentPrice is required'
+        },
+        notEmpty:{
+            errorMessage:'RentPrice cannot be empty'
         }
 
     }
