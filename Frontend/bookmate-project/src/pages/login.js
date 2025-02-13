@@ -1,0 +1,345 @@
+// import { useContext, useState } from "react"
+// import axios from '../config/axios'
+// import AuthContext from "../context/authContext"
+// import { useNavigate } from "react-router-dom"
+
+// export default function Login(){
+//     const navigate=useNavigate()
+//     const {handleLogin,userState}=useContext(AuthContext)
+//     const formInitialValue={
+//         email:"",
+//         password:""
+//     }
+//     const [form,setForm]=useState(formInitialValue)
+//     const [clientError,setClientError]=useState({})
+//     const [serverError,setServerError]=useState([])
+//     const errors={}
+//     const runClientValidation=()=>{
+//         if(form.email.trim().length==0){
+//             errors.email='*email is required'
+//         }
+//         if(form.password.trim().length==0){
+//             errors.password='*password is required'
+//         }
+//     }
+//     const handleSubmit=async(e)=>{
+//         e.preventDefault()
+//         runClientValidation()
+//         if(Object.keys(errors).length==0){
+//             try{
+//                 const result=await axios.post('/api/user/login',form)
+//                 console.log('token',result?.data)
+//                 localStorage.setItem('token',result?.data?.token)
+               
+//                 const response=await axios.get('/api/user/account',
+//                     {headers:{Authorization:localStorage.getItem('token')}}
+//                 )
+//                 console.log('account',response?.data)
+//                 handleLogin(response?.data)
+//                 if (response?.data?.role === 'vendor') {
+//                     navigate('/vhome');
+//                 } else {
+//                     navigate('/');
+//                 }
+//             }catch(err){
+//                 console.log(err.response?.data)
+//                 setServerError(err.response?.data?.errors)
+//             }
+        
+//         }else{
+//             setClientError(errors)
+            
+//         }
+//     }
+//     return (
+//         <div>
+//             <h2>Login</h2>
+//             {serverError&&serverError.map(ele=><li key={ele._id}>{ele.msg}</li>)}
+//             <form onSubmit={handleSubmit}>
+//                 <input type="email"
+//                 value={form.email}
+//                 onChange={(e)=>setForm({...form,email:e.target.value})}
+//                 placeholder="Enter your email"/><br/>
+//                 {clientError.email&&<i style={{color:'red',fontSize:"13px"}}>{clientError.email}</i>}<br/>
+
+//                 <input type="password"
+//                 value={form.password}
+//                 onChange={(e)=>setForm({...form,password:e.target.value})}
+//                 placeholder="Enter your password"/><br/>
+//                 {clientError.password&&<i style={{color:'red',fontSize:"13px"}}>{clientError.password}</i>}<br/>
+
+//                 <input type="Submit" 
+//                 value="Login"/>
+//             </form>
+//         </div>
+//     )
+// }
+// import { useContext, useState } from "react";
+// import axios from "../config/axios";
+// import AuthContext from "../context/authContext";
+// import { useNavigate, Link } from "react-router-dom";
+
+// export default function Login() {
+//   const navigate = useNavigate();
+//   const { handleLogin, userState } = useContext(AuthContext);
+//   const formInitialValue = {
+//     email: "",
+//     password: "",
+//   };
+//   const [form, setForm] = useState(formInitialValue);
+//   const [clientError, setClientError] = useState({});
+//   const [serverError, setServerError] = useState([]);
+//   const errors = {};
+
+//   const runClientValidation = () => {
+//     if (form.email.trim().length === 0) {
+//       errors.email = "*Email is required";
+//     }
+//     if (form.password.trim().length === 0) {
+//       errors.password = "*Password is required";
+//     }
+//   };
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     runClientValidation();
+//     if (Object.keys(errors).length === 0) {
+//       try {
+//         const result = await axios.post("/api/user/login", form);
+//         console.log("token", result?.data);
+//         localStorage.setItem("token", result?.data?.token);
+
+//         const response = await axios.get("/api/user/account", {
+//           headers: { Authorization: localStorage.getItem("token") },
+//         });
+//         console.log("account", response?.data);
+//         handleLogin(response?.data);
+//         if (response?.data?.role === "vendor") {
+//           navigate("/vhome");
+//         } else {
+//           navigate("/");
+//         }
+//       } catch (err) {
+//         console.log(err.response?.data);
+//         setServerError(err.response?.data?.errors);
+//       }
+//     } else {
+//       setClientError(errors);
+//     }
+//   };
+
+   
+//   return (
+//     <div className="min-h-screen flex flex-col bg-gray-100">
+//       {/* Header */}
+//       <header className="w-full bg-orange-500 text-white p-4 text-center flex justify-between items-center px-6">
+//         <h1 className="text-2xl font-bold">Bookmate</h1>
+        
+//         <Link to="/register" className="text-white hover:underline">
+//           Register
+//         </Link>
+//       </header>
+
+//       {/* Content Wrapper to Center the Form */}
+//       <div className="flex-grow flex items-center justify-center">
+//         <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+//           <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Login</h2>
+//           {serverError&&serverError.map(ele=><li key={ele._id}>{ele.msg}</li>)}
+//           <form className="space-y-6">
+//             <div>
+//               <input
+//                 type="email"
+//                 placeholder="Enter your email"
+//                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+//               />
+//             </div>
+//             <div>
+//               <input
+//                 type="password"
+//                 placeholder="Enter your password"
+//                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+//               />
+//             </div>
+//             <button
+//               type="submit"
+//               className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition-colors"
+//             >
+//               Login
+//             </button>
+//           </form>
+//         </div>
+//       </div>
+//     </div>
+//   );
+import { useContext, useState } from "react";
+import axios from "../config/axios";
+import AuthContext from "../context/authContext";
+import { useNavigate, Link } from "react-router-dom";
+
+export default function Login() {
+  const navigate = useNavigate();
+  const { handleLogin, userState } = useContext(AuthContext);
+  const formInitialValue = {
+    email: "",
+    password: "",
+  };
+  const [form, setForm] = useState(formInitialValue);
+  const [clientError, setClientError] = useState({});
+  const [serverError, setServerError] = useState([]);
+  const errors = {};
+
+  const runClientValidation = () => {
+    if (form.email.trim().length === 0) {
+      errors.email = "*Email is required";
+    }
+    if (form.password.trim().length === 0) {
+      errors.password = "*Password is required";
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    runClientValidation();
+    if (Object.keys(errors).length === 0) {
+      try {
+        const result = await axios.post("/api/user/login", form);
+        console.log("token", result?.data);
+        localStorage.setItem("token", result?.data?.token);
+
+        const response = await axios.get("/api/user/account", {
+          headers: { Authorization: localStorage.getItem("token") },
+        });
+        console.log("account", response?.data);
+        handleLogin(response?.data);
+        if (response?.data?.role === "vendor") {
+          navigate("/vhome");
+        } else {
+          navigate("/");
+        }
+      } catch (err) {
+        console.log(err.response?.data);
+        setServerError(err.response?.data?.errors);
+      }
+    } else {
+      setClientError(errors);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-100">
+      {/* Header */}
+      <header className="w-full bg-orange-500 text-white p-4 flex justify-between items-center px-6">
+        <h1 className="text-2xl font-bold">Bookmate</h1>
+        <Link to="/register" className="text-white hover:underline">
+          Register
+        </Link>
+      </header>
+
+      {/* Login Form */}
+      <div className="flex-grow flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+          <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
+            Login
+          </h2>
+          {serverError &&
+            serverError.map((ele) => (
+              <li key={ele._id} className="text-red-500 text-sm mb-4">
+                {ele.msg}
+              </li>
+            ))}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <input
+                type="email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                placeholder="Enter your email"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+              {clientError.email && (
+                <p className="text-red-500 text-sm mt-1">{clientError.email}</p>
+              )}
+            </div>
+            <div>
+              <input
+                type="password"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                placeholder="Enter your password"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+              {clientError.password && (
+                <p className="text-red-500 text-sm mt-1">{clientError.password}</p>
+              )}
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition-colors"
+            >
+              Login
+            </button>
+          </form>
+        </div>
+      </div>
+      <footer className="w-full bg-gray-800 text-white p-4 text-center">
+  <p>&copy; 2025 Bookmate. All rights reserved.</p>
+</footer>
+    </div>
+  );
+}
+  //(
+//     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
+//       {/* Header */}
+//       <header className="w-full bg-orange-500 text-white p-4 text-center flex justify-between items-center px-6">
+//         <h1 className="text-2xl font-bold">Bookmate</h1>
+//         <Link to="/register" className="text-white hover:underline">
+//           Register
+//         </Link>
+//       </header>
+
+//       {/* Login Form */}
+//       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md mt-6">
+//         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Login</h2>
+//         {serverError.length > 0 && (
+//           <ul className="text-red-500 text-sm mb-4">
+//             {serverError.map((ele, index) => (
+//               <li key={index}>{ele.msg}</li>
+//             ))}
+//           </ul>
+//         )}
+//         <form onSubmit={handleSubmit} className="space-y-6">
+//           <div>
+//             <input
+//               type="email"
+//               value={form.email}
+//               onChange={(e) => setForm({ ...form, email: e.target.value })}
+//               placeholder="Enter your email"
+//               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+//             />
+//             {clientError.email && (
+//               <p className="text-red-500 text-sm mt-1">{clientError.email}</p>
+//             )}
+//           </div>
+//           <div>
+//             <input
+//               type="password"
+//               value={form.password}
+//               onChange={(e) => setForm({ ...form, password: e.target.value })}
+//               placeholder="Enter your password"
+//               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+//             />
+//             {clientError.password && (
+//               <p className="text-red-500 text-sm mt-1">{clientError.password}</p>
+//             )}
+//           </div>
+//           <button
+//             type="submit"
+//             className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition-colors"
+//           >
+//             Login
+//           </button>
+//         </form>
+//       </div>
+//     </div>
+//   );
+

@@ -1,0 +1,387 @@
+/* /* .App {
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: black;
+}
+.links {
+  list-style: none;
+
+}
+.links li{
+  display: inline;
+  margin-right: 10px;
+  text-decoration: #d32f2f;
+}
+.calendar-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.react-calendar {
+  width: 350px;
+  max-width: 100%;
+  background: white;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Mark due dates with red background */
+/* .due-date {
+  background-color: red !important;
+  color: white !important;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.tooltip {
+  cursor: pointer;
+}
+
+.tooltip-box {
+  position: absolute;
+  background: black;
+  color: white;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-top: 10px;
+}
+.c-home {
+  list-style: none;
+}
+.rent-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 20px;
+  background-color: #f8f9fa;
+}
+
+/* .image-container {
+  flex: 1;
+  max-width: 40%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+*/
+/* .image-container  {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  max-width: 40%;
+  display: flex;
+  justify-content: center;
+  align-items: center
+} 
+
+.details-container {
+  flex: 2;
+  max-width: 55%;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.details-container h2 {
+  color: #333;
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.details-container p {
+  font-size: 18px;
+  margin: 5px 0;
+  color: #555;
+}
+
+.details-container h3 {
+  color: #d32f2f;
+  font-size: 24px;
+  margin-top: 10px;
+}
+
+.caution-note {
+  font-size: 16px;
+  color: #d32f2f;
+  margin-top: 15px;
+  font-weight: bold;
+} */ */
+.App {
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #F5F5F5; /* Off-White background */
+  padding: 20px;
+}
+
+h1 {
+  color: #2C3E50; /* Deep Blue for the header */
+}
+
+.links {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+.links li {
+  display: inline;
+  margin-right: 15px;
+}
+
+.links a {
+  text-decoration: none;
+  color: #333333; /* Dark Gray for links */
+  font-weight: bold;
+}
+
+.links a:hover {
+  color: #E67E22; /* Soft Orange on hover */
+}
+
+button {
+  background-color: #E67E22; /* Soft Orange for buttons */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #D35400; /* Darker Orange on hover */
+}
+
+.book-card {
+  width: 200px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 10px;
+  background-color: white; /* White card background */
+  margin: 10px;
+  transition: transform 0.2s;
+}
+
+.book-card:hover {
+  transform: scale(1.05); /* Slight zoom on hover */
+}
+
+.book-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px 8px 0 0;
+}
+
+.book-card h3 {
+  color: #2C3E50; /* Deep Blue for titles */
+  margin: 10px 0;
+}
+
+.book-card p {
+  color: #555555; /* Medium Gray for descriptions */
+  margin: 5px 0;
+}
+
+.book-card button {
+  background-color: #E67E22; /* Soft Orange for buttons */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.book-card button:hover {
+  background-color: #D35400; /* Darker Orange on hover */
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.pagination button {
+  background-color: #2C3E50; /* Deep Blue for pagination buttons */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 0 5px;
+}
+
+.pagination button:hover {
+  background-color: #1A242F; /* Darker Blue on hover */
+}
+
+.pagination span {
+  color: #333333; /* Dark Gray for page numbers */
+  margin: 0 10px;
+  line-height: 2;
+}
+
+.search-bar {
+  width: 80%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  border: 1px solid #2C3E50; /* Deep Blue border */
+  font-size: 16px;
+}
+
+.search-bar:focus {
+  outline: none;
+  border-color: #E67E22; /* Soft Orange on focus */
+}
+ */ */
+/* Header Styles */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color:orange; /* Deep Blue */
+  color: orange;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-left, .header-center, .header-right {
+  display: flex;
+  align-items: center;
+}
+
+.app-name {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+  color: rgb(16, 6, 43);
+}
+
+.search-bar {
+  width: 300px;
+  padding: 8px 12px;
+  border-radius: 5px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  margin-left: 20px;
+}
+
+.cart-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+  position: relative;
+}
+
+.cart-count {
+  background-color: #E67E22; /* Soft Orange */
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 50%;
+  position: absolute;
+  top: -8px;
+  right: -8px;
+}
+
+.logout-button {
+  background-color: #E67E22; /* Soft Orange */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.logout-button:hover {
+  background-color: #D35400; /* Darker Orange on hover */
+}
+
+/* Home Styles */
+.book-card {
+  width: 200px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 10px;
+  background-color: white;
+  margin: 10px;
+  transition: transform 0.2s;
+}
+
+.book-card:hover {
+  transform: scale(1.05);
+}
+
+.book-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px 8px 0 0;
+}
+
+.book-card h3 {
+  color: #2C3E50;
+  margin: 10px 0;
+}
+
+.book-card p {
+  color: #555555;
+  margin: 5px 0;
+}
+
+.book-card button {
+  background-color: #E67E22;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.book-card button:hover {
+  background-color: #D35400;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.pagination button {
+  background-color: #2C3E50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 0 5px;
+}
+
+.pagination button:hover {
+  background-color: #1A242F;
+}
+
+.pagination span {
+  color: #333333;
+  margin: 0 10px;
+  line-height: 2;
+}
