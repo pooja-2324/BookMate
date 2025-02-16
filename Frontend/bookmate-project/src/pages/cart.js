@@ -79,10 +79,14 @@
 // }
 import { useSelector, useDispatch } from "react-redux";
 import { fetchCart, removeFromCart, clearCart } from "../slices/cartSlice";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { AiOutlineUser, AiOutlineShoppingCart, AiOutlineSearch } from "react-icons/ai";
+import { Link } from "react-router-dom";
+import AuthContext from "../context/authContext";
 
 export default function Cart() {
+  const {handleLogout}=useContext(AuthContext)
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -115,9 +119,35 @@ export default function Cart() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
+       <header className="w-full h-10 bg-red-700 text-white p-4 flex justify-between items-center px-6 left-0 top-0">
+        <h1 className="text-2xl font-bold text-white">Bookmate</h1>
+        <div className="ml-auto flex gap-4">
+          <Link to="/profile" className="flex items-center gap-2 text-white hover:underline">
+            <AiOutlineUser size={24} /> Profile
+          </Link>
+          <Link to="/cart" className="flex items-center gap-2 text-white hover:underline">
+            <AiOutlineShoppingCart size={24} /> Cart
+          </Link>
+          <li>
+            <button
+              onClick={() => {
+                const confirm = window.confirm("Logged out?");
+                if (confirm) {
+                  handleLogout();
+                  localStorage.removeItem("token");
+                  navigate("/login");
+                }
+              }}
+              className="text-white hover:underline"
+            >
+              Logout
+            </button>
+          </li>
+        </div>
+      </header>
       <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-          My Cart
+          My Cart({cartData?.length})
         </h2>
 
         {cartData?.length === 0 ? (

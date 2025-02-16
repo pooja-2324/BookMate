@@ -6,6 +6,7 @@ const userSchema=new Schema({
     password:String,
     phone:String,
     otp:String,
+    googleId:String,
     location:{city:String,state:String},
     role:{
         type:String,

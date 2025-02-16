@@ -21,6 +21,9 @@ import ReviewDetails from './pages/reviewDetails';
 import BuyNow from './pages/buy-now';
 import DirectOrderPlacing from './pages/direcct-orderplace';
 import Header from './components/header';
+import Otp from './pages/otp-get'
+import VerifyOtp from './pages/otp-verify';
+import Profile from './pages/profile';
 
 import { Link,Route,Routes, useNavigate } from 'react-router-dom';
 import { useContext,useState } from 'react';
@@ -78,6 +81,9 @@ function App() {
         <Route path='/review/:bid' element={<PrivateRoute><ReviewDetails/></PrivateRoute>}/>
         <Route path='/book/:bid/buynow' element={<PrivateRoute><BuyNow/></PrivateRoute>}/>
         <Route path='/book/:bid/orderplacing' element={<PrivateRoute><DirectOrderPlacing/></PrivateRoute>}/>
+        <Route path='/get-otp' element={<Otp/>}/>
+        <Route path='/verify-otp' element={<VerifyOtp/>}/>
+        <Route path='/profile' element={<PrivateRoute><Profile/></PrivateRoute>}/>
       </Routes>
       
     </div>

@@ -1,99 +1,157 @@
-import { getReviews } from "../slices/reviewSlice"
-import { verifiedBooks } from "../slices/bookSlice"
-import { useSelector,useDispatch } from "react-redux"
-import { useEffect,useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
-import {Rating,ThinStar} from '@smastrom/react-rating'
-import '@smastrom/react-rating/style.css';
-export default function ReviewDetails(){
-    const navigate=useNavigate()
-    const {bid}=useParams()
-    const dispatch=useDispatch()
-    const {reviewData}=useSelector(state=>state.reviews)
-    const {bookData}=useSelector(state=>state.books)
-    const[bookRating,setBookrating]=useState(0)
-    console.log('reviewData',reviewData)
-    useEffect(()=>{
-        dispatch(getReviews({bid}))
-        dispatch(verifiedBooks())
-    },[dispatch,bid])
-    const oneBook=bookData.find(ele=>ele._id==bid)
-    useEffect(() => {
-        const average=reviewData?.map(ele=>ele.rating)
-        if (average.length > 0) {
-            const total = average.reduce((acc, cv) => acc + cv, 0);
-            const avgRating = total / average.length;
-            setBookrating(avgRating);
-        } else {
-            setBookrating(0);
-        }
-    }, [reviewData])
-    console.log('reviewbook',oneBook)
-    const handleRent=(id)=>{
-        navigate(`/book/${id}/rentnow`)
-    }
-    const handleBuy=(id)=>{
-        navigate(`/book/${id}/orderplacing`,{state:{price:oneBook.sellPrice,type:'buy'}})
-    }
-    return (
-        <div>
-            <h2>Book-Reviews</h2>
-            <img style={{
-                width: "160px",
-                textAlign: "center",
-                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-                borderRadius: "8px",
-                padding: "10px",
-                backgroundColor: "#FEF3C7"
-            }}
-            src={oneBook?.coverImage}/>
-            <button onClick={()=>handleRent(oneBook._id)}>Rent Now</button>
-            {oneBook.isSelling?<button onClick={()=>handleBuy(oneBook._id)}>Buy Now</button>:<></>}
-            
-             <h5>Product Details</h5>
-             <h6>Rating-{bookRating}</h6>
-             
-             <Rating
-                                    value={bookRating}
-                                    itemShapes={ThinStar}
-                                    readOnly // Make the rating read-only
-                                    style={{ maxWidth: 100 ,marginLeft:'380px'}}
-                                />
-             <p>Author-{oneBook?.author}</p>
-             <p>publishedYear-{oneBook?.publishedYear}</p>
-             {oneBook?.genre?.length!==0?<p>Theme<br/>{oneBook?.genre?.join(' ,')}</p>:<></>}
-                
-             
-             
-             {oneBook?.pages?<p>Pages-{oneBook?.pages}</p>:<></>}
-             
-             <p>vendor-{oneBook?.vendor.name}</p>
-            
-             <hr/><hr/>
-             
-           <ul style={{listStyle:'none'}}> {reviewData?.map(ele=>(
-            
-           
-            <li>
-                <strong>{ele.reviewBy.name}</strong><br/>
-                Posted on {ele.updatedAt.split('T')[0]}<br/>
-                <img src= {ele.photo}/>
-               <br/>
-                {ele.reviewText}<br/>
-                <div style={{marginLeft:'307px'}}>
-                                <Rating
-                                    value={ele.rating}
-                                    itemShapes={ThinStar}
-                                    readOnly // Make the rating read-only
-                                    style={{ maxWidth: 100 }}
-                                />
-                                <div style={{backgroundColor:'green',width:'20px'}}>{ele.rating}</div>
-                            </div>
-               <hr/>
-                </li>
-            
-           ))}</ul>
+import { getReviews } from "../slices/reviewSlice";
+import { verifiedBooks } from "../slices/bookSlice";
+import { useSelector, useDispatch } from "react-redux";
+import { useEffect, useState,useContext } from "react";
+import AuthContext from "../context/authContext";
+import { useNavigate, useParams } from "react-router-dom";
+import { AiOutlineUser, AiOutlineShoppingCart} from "react-icons/ai";
+import { Link } from "react-router-dom";
+import { Rating, ThinStar } from "@smastrom/react-rating";
+import "@smastrom/react-rating/style.css";
 
+export default function ReviewDetails() {
+  const { handleLogout } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const { bid } = useParams();
+  const dispatch = useDispatch();
+  const { reviewData } = useSelector((state) => state.reviews);
+  const { bookData } = useSelector((state) => state.books);
+  const [bookRating, setBookrating] = useState(0);
+
+  useEffect(() => {
+    dispatch(getReviews({ bid }));
+    dispatch(verifiedBooks());
+  }, [dispatch, bid]);
+
+  const oneBook = bookData.find((ele) => ele._id === bid);
+
+  useEffect(() => {
+    const average = reviewData?.map((ele) => ele.rating) || [];
+    if (average.length > 0) {
+      const total = average.reduce((acc, cv) => acc + cv, 0);
+      const avgRating = total / average.length;
+      setBookrating(avgRating);
+    } else {
+      setBookrating(0);
+    }
+  }, [reviewData]);
+
+  const handleRent = (id) => {
+    navigate(`/book/${id}/rentnow`);
+  };
+
+  const handleBuy = (id) => {
+    navigate(`/book/${id}/orderplacing`, { state: { price: oneBook.sellPrice, type: "buy" } });
+  };
+
+  if (!oneBook) return <p className="text-center text-lg font-semibold">Book not found.</p>;
+
+  return (
+    <div className="max-w-6xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+       <header className="w-full h-8 bg-red-700 text-white p-4 flex justify-between items-center px-6 left-0 top-0">
+        <h1 className="text-2xl font-bold">Bookmate</h1>
+        <div className="ml-auto flex gap-4">
+          <Link to="/profile" className="flex items-center gap-2 text-white hover:underline">
+            <AiOutlineUser size={24} /> Profile
+          </Link>
+          <Link to="/cart" className="flex items-center gap-2 text-white hover:underline">
+            <AiOutlineShoppingCart size={24} /> Cart
+          </Link>
+          <li>
+            <button
+              onClick={() => {
+                const confirm = window.confirm("Logged out?");
+                if (confirm) {
+                  handleLogout();
+                  localStorage.removeItem("token");
+                  navigate("/login");
+                }
+              }}
+              className="text-white hover:underline"
+            >
+              Logout
+            </button>
+          </li>
         </div>
-    )
+      </header>
+      {/* Book Image and Details */}
+      <div className="flex flex-col md:flex-row mt-6 gap-8">
+        {/* Book Image (Left Side) */}
+        <div className="flex-shrink-0 w-full md:w-1/2">
+          <img
+            className="w-full h-auto max-w-md rounded-lg shadow-md bg-yellow-100 p-4"
+            src={oneBook.coverImage}
+            alt="Book Cover"
+          />
+        </div>
+
+        {/* Book Details (Right Side) */}
+        <div className="flex-grow w-full md:w-1/2">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">{oneBook.modifiedTitle}</h2>
+
+          {/* Rent and Buy Buttons */}
+          <div className="flex space-x-4 mb-6">
+            <button
+              onClick={() => handleRent(oneBook._id)}
+              disabled={oneBook.status === "notAvailable"}
+              className={`mt-3 px-4 py-2 rounded-md transition-colors font-semibold ${
+                oneBook.status === "notAvailable"
+                  ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                  : "bg-green-500 text-white hover:bg-green-600"
+              }`}
+            >
+              Rent at ₹{oneBook.rentPrice}/-
+            </button>
+
+            {oneBook.isSelling && (
+              <button
+                onClick={() => handleBuy(oneBook._id)}
+                disabled={oneBook.status === "notAvailable"}
+                className={`mt-3 px-4 py-2 rounded-md transition-colors font-semibold ${
+                  oneBook.status === "notAvailable"
+                    ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                    : "bg-blue-500 text-white hover:bg-blue-600"
+                }`}
+              >
+                Buy at ₹{oneBook.sellPrice}/-
+              </button>
+            )}
+          </div>
+
+          {/* Product Details */}
+          <div className="space-y-4">
+            <p className="text-gray-700">
+              <strong>Rating:</strong> {bookRating.toFixed(1)}
+              <Rating value={bookRating} itemShapes={ThinStar} readOnly style={{ maxWidth: 100, marginLeft: 10 }} />
+            </p>
+            <p className="text-gray-700"><strong>Author:</strong> {oneBook.author}</p>
+            <p className="text-gray-700"><strong>Published Year:</strong> {oneBook.publishedYear}</p>
+            {oneBook.genre?.length !== 0 && (
+              <p className="text-gray-700"><strong>Theme:</strong> {oneBook.genre.join(", ")}</p>
+            )}
+            {oneBook.pages && <p className="text-gray-700"><strong>Pages:</strong> {oneBook.pages}</p>}
+            <p className="text-gray-700"><strong>Vendor:</strong> {oneBook.vendor.name}</p>
+            <p className="text-gray-700"><strong>Description:</strong> <i>{oneBook.description}</i></p>
+          </div>
+        </div>
+      </div>
+
+      {/* Reviews Section */}
+      <hr className="my-6" />
+      <h5 className="text-lg font-semibold text-gray-700">Customer Reviews</h5>
+      <ul className="space-y-6 mt-4">
+        {reviewData?.map((ele) => (
+          <li key={ele._id} className="border rounded-lg p-4 shadow-md bg-gray-50">
+            <strong className="text-gray-800">{ele.reviewBy.name}</strong>
+            <p className="text-gray-600 text-sm">Posted on {ele.updatedAt.split("T")[0]}</p>
+            <p className="text-gray-700 mt-2">{ele.reviewText}</p>
+            <div className="flex items-center mt-2">
+              <Rating value={ele.rating} itemShapes={ThinStar} readOnly style={{ maxWidth: 100 }} />
+              <span className="ml-2 px-2 py-1 bg-green-500 text-white text-sm rounded-md">{ele.rating}</span>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }

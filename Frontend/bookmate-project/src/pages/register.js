@@ -222,7 +222,7 @@ export default function Register() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       {/* Header */}
-      <header className="w-full bg-orange-500 text-white p-4 text-center flex justify-between items-center px-6">
+      <header className="w-full h-8 bg-red-700 text-white p-4 flex justify-between items-center px-6 left-0 top-0">
         <h1 className="text-2xl font-bold">Bookmate</h1>
         <Link to='/login'>Login</Link>
       </header>
@@ -374,7 +374,7 @@ export default function Register() {
 
             <button
               type="submit"
-              className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition-colors"
+              className="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition-colors"
             >
               Register
             </button>

@@ -1,9 +1,14 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchRentDetails, assignEditId } from "../slices/rentSlice";
-import { useEffect } from "react";
+import { useEffect,useContext } from "react";
+import { Link } from "react-router-dom";
+import { AiOutlineUser,AiOutlineShoppingCart, } from "react-icons/ai";
+import AuthContext from "../context/authContext";
+
 
 export default function Rent() {
+    const {handleLogout}=useContext(AuthContext)
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { bookData } = useSelector((state) => state.books);
@@ -24,6 +29,28 @@ export default function Rent() {
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+        <header className="w-full bg-orange-500 text-white p-4 flex justify-between items-center px-6">
+        <h1 className="text-2xl font-bold">Bookmate</h1>
+        <div className="ml-auto flex gap-4">
+          <Link to="/profile" className="flex items-center gap-2 text-white hover:underline">
+            <AiOutlineUser size={24} /> Profile
+          </Link>
+          <Link to="/cart" className="flex items-center gap-2 text-white hover:underline">
+            <AiOutlineShoppingCart size={24} /> Cart
+
+          </Link>
+          <li><button onClick={()=>{
+        const confirm=window.confirm('Logged out?')
+        if(confirm){
+          handleLogout()
+          localStorage.removeItem('token')
+          navigate('/login')
+        }
+       
+       }
+       }>Logout</button></li>
+        </div>
+      </header>
       <h2 className="text-2xl font-semibold text-gray-800 mb-4">Rent Details</h2>
       {selectedBook ? (
         <div className="mb-6">

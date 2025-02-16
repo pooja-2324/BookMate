@@ -95,50 +95,88 @@ userCtrl.count=async(req,res)=>{
     }
  }
 
-userCtrl.getOtp=async(req,res)=>{
-    try{
-        const {phone} =req.body
-        const otp = Math.floor(100000 + Math.random() * 900000).toString()
+ userCtrl.getOtp = async (req, res) => {
+    try {
+        const { phone } = req.body;
+
+        // Input validation
+        if (!phone || typeof phone !== 'string') {
+            return res.status(400).json({ error: 'Invalid phone number' });
+        }
+
+        // Generate OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // Initialize Twilio client
         const client = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
+
+        // Send OTP via Twilio
         await client.messages.create({
             body: `Your OTP is ${otp}`,
             from: process.env.TWILIO_PHONE_NUMBER, // Twilio phone number
-            to: phone // User's phone number
+            to: phone,
         });
 
-        
+        // Store OTP and expiry in session
         req.session.otp = otp;
-        req.session.otpExpiry = Date.now() + 5 * 60 * 1000; // 5 minutes
+        console.log("Session data:", req.session.otp);
+
+        req.session.otpExpiry = Date.now() + 5 * 60 * 1000; // 5 minutes expiry
 
         res.json({ message: 'OTP sent successfully' });
-    }catch(err){
-        console.log(err)
-        res.status(500).json({error:'something wnet wrong'})
+    } catch (err) {
+        console.error('Error in getOtp:', err);
 
+        // Handle Twilio-specific errors
+        if (err.code === 21211) {
+            return res.status(400).json({ error: 'Invalid phone number' });
+        }
+
+        res.status(500).json({ error: 'Something went wrong' });
     }
-}
-userCtrl.verifyOtp=async(req,res)=>{
-    const {otp,phone}=req.body
-    console.log('session',req.session.otp)
+};
 
-    if (req.session.otp !== otp) {
-        return res.status(400).json({ error: 'Invalid OTP' });
+userCtrl.verifyOtp = async (req, res) => {
+    try {
+        const { otp, phone } = req.body;
+
+        // Input validation
+        if (!otp || !phone) {
+            return res.status(400).json({ error: 'OTP and phone number are required' });
+        }
+        console.log("Session data:", req.session.otp);
+
+        // Check if OTP matches
+        if (req.session.otp !== otp) {
+            return res.status(400).json({ error: 'Invalid OTP' });
+        }
+
+        // Check if OTP has expired
+        if (Date.now() > req.session.otpExpiry) {
+            return res.status(400).json({ error: 'OTP has expired' });
+        }
+
+        // Find user by phone number
+        const user = await User.findOne({ phone });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Generate JWT token
+        const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, {
+            expiresIn: '7d',
+        });
+
+        // Clear OTP from session after successful verification
+        req.session.otp = null;
+        req.session.otpExpiry = null;
+
+        res.json({ token: `Bearer ${token}` });
+    } catch (err) {
+        console.error('Error in verifyOtp:', err);
+        res.status(500).json({ error: 'Something went wrong',err });
     }
-
-    if (Date.now() > req.session.otpExpiry) {
-        return res.status(400).json({ error: 'OTP has expired' });
-    }
-
-    // Proceed with generating JWT token or other logic
-    const user = await User.findOne({ phone });
-    if (!user) {
-        return res.status(404).json({ error: 'User not found' });
-    }
-
-    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
-
-    res.json({ token: `Bearer ${token}` });
-}
+};
 
  userCtrl.account=async(req,res)=>{
     try{
@@ -181,5 +219,38 @@ userCtrl.verifyOtp=async(req,res)=>{
         }
     }
 
-
+    // userCtrl.googleSignIn = async (req, res) => {
+    //     try {
+    //         const { idToken } = req.body; // Accept role from request
+    
+    //         if (!role || !['client', 'vendor'].includes(role)) {
+    //             return res.status(400).json({ error: 'Role must be either client or vendor' });
+    //         }
+    
+    //         // Verify Google ID Token
+    //         const ticket = await client.verifyIdToken({
+    //             idToken,
+    //             audience: process.env.GOOGLE_CLIENT_ID,
+    //         });
+    
+    //         const payload = ticket.getPayload();
+    //         const { email, name, picture, sub } = payload;
+    
+    //         // Check if user already exists
+    //         let user = await User.findOne({ email });
+    
+         
+    
+    //         // Generate JWT token
+    //         const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, {
+    //             expiresIn: "7d",
+    //         });
+    
+    //         res.json({ token: `Bearer ${token}`, user });
+    
+    //     } catch (err) {
+    //         console.error("Error in Google Sign-In:", err);
+    //         res.status(500).json({ error: "Something went wrong" });
+    //     }
+    // };
  export default userCtrl

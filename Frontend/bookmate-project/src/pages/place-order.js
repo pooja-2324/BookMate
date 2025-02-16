@@ -1,64 +1,15 @@
-// import { useDispatch, useSelector } from "react-redux"
-// import { fetchCart } from "../slices/cartSlice"
-// import { useEffect } from "react"
-// import { placeOrder } from "../slices/rentSlice"
-// import { useNavigate } from "react-router-dom"
-// export default function PlaceOrder(){
-//     const navigate=useNavigate()
-//     const {cartData}=useSelector(state=>state.carts)
-//     const dispatch=useDispatch()
-    
-//     console.log('cart',cartData)
-//     useEffect(()=>{
-//         dispatch(fetchCart())
-//     },[dispatch])
-//     const totalAmount=cartData?.reduce((acc,cv)=>{
-//         return acc+cv.rent.pricing.cautionDeposit+cv.rent.pricing.platformFee+cv.rent.pricing.readingFee+cv.rent.pricing.deliveryFee
-//     },0)
-//     const handleOrder=()=>{
-//         dispatch(placeOrder()).then(()=>{navigate('/order-confirm')})
-//     }
-//     return(
-//         <div>
-//             <h3>Order-Placing</h3>
-//             {cartData?.map(ele => (
-//                         <div key={ele.id}>
-//                             <img style={{
-//                 width: "160px",
-//                 textAlign: "center",
-//                 boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-//                 borderRadius: "8px",
-//                 padding: "10px",
-//                 backgroundColor: "#FEF3C7"
-//             }}
-//                             src={ele.book?.coverImage} alt={ele.title} />
-//                             <div>
-//                                 <h2>{ele.book?.modifiedTitle}</h2>
-//                                 <h3>Vendor: {ele.book?.vendor}</h3>
-//                                 <h3>Duration: {ele.rent?.period} days</h3>
-//                                 <h3>
-//                                     Amount : ₹
-//                                     {ele.rent?.pricing.cautionDeposit +
-//                                         ele.rent?.pricing.deliveryFee +
-//                                         ele.rent?.pricing.platformFee +
-//                                         ele.rent?.pricing.readingFee}
-//                                 </h3>
-                               
-//                             </div>
-//                         </div>))}
-//                         <h4>Total:{totalAmount}</h4>
-//                         <button onClick={handleOrder}>Place Order</button>
-                          
-//         </div>
-//     )
-// }
+
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCart } from "../slices/cartSlice";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { placeOrder } from "../slices/rentSlice";
 import { useNavigate } from "react-router-dom";
+import AuthContext from "../context/authContext";
+import { AiOutlineUser, AiOutlineShoppingCart} from "react-icons/ai";
+import { Link } from "react-router-dom";
 
 export default function PlaceOrder() {
+  const {handleLogout}=useContext(AuthContext)
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { cartData } = useSelector((state) => state.carts);
@@ -93,6 +44,32 @@ export default function PlaceOrder() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
+        <header className="w-full h-8 bg-red-700 text-white p-4 flex justify-between items-center px-6 left-0 top-0">
+        <h1 className="text-2xl font-bold">Bookmate</h1>
+        <div className="ml-auto flex gap-4">
+          <Link to="/profile" className="flex items-center gap-2 text-white hover:underline">
+            <AiOutlineUser size={24} /> Profile
+          </Link>
+          <Link to="/cart" className="flex items-center gap-2 text-white hover:underline">
+            <AiOutlineShoppingCart size={24} /> Cart
+          </Link>
+          <li>
+            <button
+              onClick={() => {
+                const confirm = window.confirm("Logged out?");
+                if (confirm) {
+                  handleLogout();
+                  localStorage.removeItem("token");
+                  navigate("/login");
+                }
+              }}
+              className="text-white hover:underline"
+            >
+              Logout
+            </button>
+          </li>
+        </div>
+      </header>
       <h3 className="text-2xl font-bold text-gray-800 text-center mb-4">
         Order Placing
       </h3>

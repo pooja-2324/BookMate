@@ -23,7 +23,7 @@ export default function AuthProvider(props){
                 handleLogin(response.data)
             }catch(err){
                 localStorage.removeItem('token')
-                console.log(err.response.data.error)
+                console.log(err.response?.data?.error)
             }
         })()
     },[])

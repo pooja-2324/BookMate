@@ -1,6 +1,11 @@
 import { AiOutlineCheckCircle } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
 
 export default function OrderConfirm() {
+    const navigate=useNavigate()
+    const handleClick=()=>{
+        navigate('/')
+    }
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-6 rounded-lg shadow-md text-center">
@@ -10,6 +15,7 @@ export default function OrderConfirm() {
         </h4>
         <p className="text-gray-600 mt-2">Thank you for shopping with us.</p>
       </div>
+      <button onClick={handleClick}>Continue Shopping</button>
     </div>
   );
 }

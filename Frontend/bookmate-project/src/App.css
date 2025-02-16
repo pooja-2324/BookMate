@@ -143,11 +143,11 @@ h1 {
 }
 
 .links a:hover {
-  color: #E67E22; /* Soft Orange on hover */
+  color: red; /* Soft Orange on hover */
 }
 
 button {
-  background-color: #E67E22; /* Soft Orange for buttons */
+  background-color: red; /* Soft Orange for buttons */
   color: white;
   border: none;
   padding: 10px 20px;
@@ -156,7 +156,7 @@ button {
 }
 
 button:hover {
-  background-color: #D35400; /* Darker Orange on hover */
+  background-color: red; /* Darker Orange on hover */
 }
 
 .book-card {
@@ -174,14 +174,14 @@ button:hover {
   transform: scale(1.05); /* Slight zoom on hover */
 }
 
-.book-card img {
+/* .book-card img {
   width: 100%;
   height: auto;
   border-radius: 8px 8px 0 0;
-}
+} */
 
 .book-card h3 {
-  color: #2C3E50; /* Deep Blue for titles */
+  color: black; /* Deep Blue for titles */
   margin: 10px 0;
 }
 
@@ -245,15 +245,15 @@ button:hover {
 }
  */ */
 /* Header Styles */
-.app-header {
+/* .app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
   background-color:orange; /* Deep Blue */
-  color: orange;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+  /* //color: orange;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+/* }  */
 
 .header-left, .header-center, .header-right {
   display: flex;
@@ -347,8 +347,8 @@ button:hover {
 }
 
 .book-card button {
-  background-color: #E67E22;
-  color: white;
+  background-color:#FFE6C9;
+  color: black;
   border: none;
   padding: 8px 16px;
   border-radius: 5px;
@@ -357,7 +357,7 @@ button:hover {
 }
 
 .book-card button:hover {
-  background-color: #D35400;
+  background-color: #FFE6C9;
 }
 
 .pagination {
