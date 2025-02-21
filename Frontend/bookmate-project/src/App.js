@@ -24,6 +24,8 @@ import Header from './components/header';
 import Otp from './pages/otp-get'
 import VerifyOtp from './pages/otp-verify';
 import Profile from './pages/profile';
+import CurrentBooks from './pages/v-currentBooks';
+import ReviewPhotos from './pages/review-photo';
 
 import { Link,Route,Routes, useNavigate } from 'react-router-dom';
 import { useContext,useState } from 'react';
@@ -47,6 +49,8 @@ function App() {
         {userState.user.role=='vendor'&&<li><Link to="/vhome">MyBooks</Link></li>}
         {userState.user.role=='vendor'&&<li><Link to='/calender'>DueDateCalender</Link></li>}
         {userState.user.role=='vendor'&&<li><Link to='/clientBook'>ClientBook</Link></li>}
+        {userState.user.role=='vendor'&&<li><Link to='/currentBooks'>CurrentBooks</Link></li>}
+
 
         
         
@@ -67,7 +71,7 @@ function App() {
         <Route path='/register' element={<Register/>}/>
         <Route path="/vhome" element={<PrivateRoute permittedRole={['vendor']}><MyBooks/></PrivateRoute>}/>
         <Route path="/upload" element={<PrivateRoute  permittedRole={['vendor']}><Upload/></PrivateRoute>}/>
-        <Route path='/vdashboard' element={<PrivateRoute permittedRole={['vendor']}><VDashboard/></PrivateRoute>}/>
+        
         <Route path='/earnings' element={<PrivateRoute><Earnings/></PrivateRoute>}/>
         <Route path='/book/:bid/uploadrentDetails' element={<PrivateRoute><RentDetails/></PrivateRoute>}/>
         <Route path='/book/:bid/rent' element={<PrivateRoute><Rent/></PrivateRoute>}/>
@@ -84,6 +88,8 @@ function App() {
         <Route path='/get-otp' element={<Otp/>}/>
         <Route path='/verify-otp' element={<VerifyOtp/>}/>
         <Route path='/profile' element={<PrivateRoute><Profile/></PrivateRoute>}/>
+        <Route path='/currentBooks' element={<PrivateRoute><CurrentBooks/></PrivateRoute>}/>
+        <Route path='/review-photo/:rid' element={<PrivateRoute><ReviewPhotos/></PrivateRoute>}/>
       </Routes>
       
     </div>

@@ -1,10 +1,10 @@
 import { getReviews } from "../slices/reviewSlice";
 import { verifiedBooks } from "../slices/bookSlice";
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect, useState,useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import AuthContext from "../context/authContext";
 import { useNavigate, useParams } from "react-router-dom";
-import { AiOutlineUser, AiOutlineShoppingCart} from "react-icons/ai";
+import { AiOutlineUser, AiOutlineShoppingCart } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import { Rating, ThinStar } from "@smastrom/react-rating";
 import "@smastrom/react-rating/style.css";
@@ -24,7 +24,7 @@ export default function ReviewDetails() {
   }, [dispatch, bid]);
 
   const oneBook = bookData.find((ele) => ele._id === bid);
-
+    console.log('oneBook',oneBook)
   useEffect(() => {
     const average = reviewData?.map((ele) => ele.rating) || [];
     if (average.length > 0) {
@@ -48,7 +48,7 @@ export default function ReviewDetails() {
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-       <header className="w-full h-8 bg-red-700 text-white p-4 flex justify-between items-center px-6 left-0 top-0">
+      <header className="w-full h-8 bg-red-700 text-white p-4 flex justify-between items-center px-6 left-0 top-0">
         <h1 className="text-2xl font-bold">Bookmate</h1>
         <div className="ml-auto flex gap-4">
           <Link to="/profile" className="flex items-center gap-2 text-white hover:underline">
@@ -74,13 +74,14 @@ export default function ReviewDetails() {
           </li>
         </div>
       </header>
+
       {/* Book Image and Details */}
       <div className="flex flex-col md:flex-row mt-6 gap-8">
         {/* Book Image (Left Side) */}
         <div className="flex-shrink-0 w-full md:w-1/2">
           <img
             className="w-full h-auto max-w-md rounded-lg shadow-md bg-yellow-100 p-4"
-            src={oneBook.coverImage}
+            src={oneBook?.coverImage}
             alt="Book Cover"
           />
         </div>
@@ -137,21 +138,47 @@ export default function ReviewDetails() {
       </div>
 
       {/* Reviews Section */}
-      <hr className="my-6" />
-      <h5 className="text-lg font-semibold text-gray-700">Customer Reviews</h5>
-      <ul className="space-y-6 mt-4">
-        {reviewData?.map((ele) => (
-          <li key={ele._id} className="border rounded-lg p-4 shadow-md bg-gray-50">
-            <strong className="text-gray-800">{ele.reviewBy.name}</strong>
-            <p className="text-gray-600 text-sm">Posted on {ele.updatedAt.split("T")[0]}</p>
-            <p className="text-gray-700 mt-2">{ele.reviewText}</p>
-            <div className="flex items-center mt-2">
-              <Rating value={ele.rating} itemShapes={ThinStar} readOnly style={{ maxWidth: 100 }} />
-              <span className="ml-2 px-2 py-1 bg-green-500 text-white text-sm rounded-md">{ele.rating}</span>
-            </div>
-          </li>
-        ))}
-      </ul>
+<hr className="my-6" />
+<h5 className="text-lg font-semibold text-gray-700">Customer Reviews</h5>
+<ul className="space-y-6 mt-4">
+  {reviewData?.map((ele) => (
+    <li key={ele._id} className="border rounded-lg p-4 shadow-md bg-gray-50">
+      {/* Reviewer Name and Date */}
+      <strong className="text-gray-800">{ele.reviewBy.name}</strong>
+      <p className="text-gray-600 text-sm">Posted on {ele.updatedAt.split("T")[0]}</p>
+
+      {/* Review Text */}
+      <p className="text-gray-700 mt-2">{ele.reviewText}</p>
+
+      {/* Review Rating */}
+      <div className="flex items-center mt-2">
+        <Rating
+          value={ele.rating}
+          itemShapes={ThinStar}
+          readOnly
+          style={{ maxWidth: 100 }}
+        />
+        <span className="ml-2 px-2 py-1 bg-green-500 text-white text-sm rounded-md">
+          {ele.rating}
+        </span>
+      </div>
+
+      {/* Review Photos */}
+      {ele.photo?.length > 0 && (
+        <div className="mt-4 flex gap-2">
+          {ele.photo.map((image, index) => (
+            <img
+              key={index}
+              src={image.url} // Assuming `photo` contains objects with a `url` property
+              alt={`Review ${index + 1}`}
+              className="w-24 h-24 object-cover rounded-lg"
+            />
+          ))}
+        </div>
+      )}
+    </li>
+  ))}
+</ul>
     </div>
   );
 }

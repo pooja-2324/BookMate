@@ -37,7 +37,7 @@ const rentSchema=new Schema({
       isDamaged:Boolean,
       deliveryStatus:{
             type:String,
-            enum:['order placed','delivered']
+            enum:['order placed','delivered','returned']
       },
       updatedAt:{
             type:Date,

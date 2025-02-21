@@ -5,6 +5,9 @@ import Vendor from "../models/vendor-model.js";
 import Cart from "../models/cart-model.js";
 import Buy from '../models/selling-model.js'
 import Order from "../models/order-model.js";
+import { notifyVendor } from "../../config/nodemailer-vendor.js";
+import { notifyClient } from "../../config/nodemailer-client.js";
+import cron from 'node-cron'
 
 const rentCtrl={}
 rentCtrl.details=async(req,res)=>{
@@ -53,7 +56,7 @@ rentCtrl.details=async(req,res)=>{
 }
 rentCtrl.active=async(req,res)=>{
   try{
-    const activeRents=await Rent.find({rentedBookStatus:'active',vendor:req.currentUser.userId}).populate('book')
+    const activeRents=await Rent.find({rentedBookStatus:'active',vendor:req.currentUser.userId}).populate('book').populate('client')
       if(!activeRents){
         return res.status(404).json({error:'rent not found'})
       }
@@ -327,7 +330,7 @@ rentCtrl.bothPlaceOrder = async (req, res) => {
           {new:true}
         );
 
-        const vendor = await Vendor.findOne({ vendor: book.vendor });
+        const vendor = await Vendor.findOne({ vendor: book.vendor }).populate('vendor');
 
         if (vendor) {
           // Check if the book already exists in `totalEarnings`
@@ -357,6 +360,13 @@ rentCtrl.bothPlaceOrder = async (req, res) => {
               { new: true }
             );
           }
+          await notifyVendor(vendor.vendor.email,{
+           book: book.modifiedTitle,
+           rentalStartDate,
+           dueDate,
+           type:'rent',
+           pricing:rent.pricing
+          })
         }
         await Order.create({
           vendor: book.vendor,
@@ -429,6 +439,12 @@ rentCtrl.bothPlaceOrder = async (req, res) => {
             );
             console.log('buy vendor',buyVendor)
           }
+          await notifyVendor(vendor.vendor.email,{
+            book: book.modifiedTitle,
+            
+            type:'buy',
+            pricing:{sellPrice:buy.sellPrice}
+           })
         }
         await Order.create({
           vendor: book.vendor,
@@ -703,4 +719,70 @@ try{
 }
   
 };
+rentCtrl.orderPlaced=async(req,res)=>{
+  try{
+    const vendor=req.currentUser.userId
+    const books=await Rent.find({vendor,deliveryStatus:'order placed'}).populate('book').populate('client')
+    if(!books){
+      return res.status(404).json({error:'no books found'})
+    }
+    res.json(books)
+  }catch(err){
+    console.log(err)
+    re.status(500).json({error:'something went wrong'})
+  }
+}
+rentCtrl.toDelivered=async(req,res)=>{
+  try{
+    const id=req.params.id
+    const vendor=req.currentUser.userId
+    const rent=await Rent.findById(id)
+    if(!rent){
+      return rent.status(404).json({error:'rent not found'})
+    }
+    const rentalStartDate = new Date();
+  const dueDate = new Date(rentalStartDate);
+  dueDate.setDate(rentalStartDate.getDate() + rent.period);
+    console.log('period',rent.period)
+    const rents=await Rent.findOneAndUpdate({_id:id,vendor},{deliveryStatus:'delivered',rentalStartDate,dueDate},{new:true,runValidators:true})
+    if(!rent){
+    return res.status(404).json({error:'rent not found'})
+    }
+    res.json(rents)
+
+  }catch(err){
+    console.log(err)
+    res.status(500).json({error:'something went wrong'})
+  }
+}
+export const notifyDueDates=async()=>{
+  try{
+    const twoDaysFromNow=new Date()
+    twoDaysFromNow.setDate(twoDaysFromNow.getDate()+2)
+    const rentalDueSoon=await Rent.find({dueDate:{
+      $lte:twoDaysFromNow,
+      $gt:new Date()
+    },
+    rentedBookStatus:'active'
+  
+  }).populate('client').populate('book')
+  console.log('rentalDue',rentalDueSoon)
+  if(rentalDueSoon.length==0){
+   console.log('no rental due dates found for next two days')
+   return
+  }
+  for(const rental of rentalDueSoon){
+    const clientEmail=rental.client.email
+    const bookTitle=rental.book.modifiedTitle
+    const dueDate=rental.dueDate.toLocaleDateString()
+    await notifyClient(clientEmail, {
+      subject: "Reminder: Rental Due Soon",
+      text: `Your rental for "${bookTitle}" is due on ${dueDate}. Please return the book on time to avoid late fees.`,
+      html: `<strong>Reminder:</strong> Your rental for "${bookTitle}" is due on ${dueDate}. Please return the book on time to avoid late fees.`,
+    })
+  }
+  }catch(err){
+    console.log(err)
+  }
+}
 export default rentCtrl

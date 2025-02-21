@@ -134,6 +134,7 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import { fileURLToPath } from 'url';
 import { checkSchema } from "express-validator";
+import cron from 'node-cron'
 
 import configureDB from "./config/db.js";
 import passport from "./config/passport.js";
@@ -163,6 +164,7 @@ import { idValidationSchema } from "./App/validations/idValidationSchema.js";
 import { bookCreateSchema, bookUpdateSchema } from "./App/validations/book-validation.js";
 import { rentDetailsSchema } from "./App/validations/rent-Validation.js";
 import { buyValidationSchema } from "./App/validations/buyValidation.js";
+import { notifyDueDates } from "./App/controller/rentCtrl.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -191,6 +193,16 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// cron.schedule("0 0 * * *", () => {
+//     console.log("Checking due dates and sending notifications...");
+//     checkDueDatesAndNotify();
+//   });
+  cron.schedule("0 0 * * * *", async() => {
+    console.log("Test cron running every 5 seconds");
+    notifyDueDates();
+});
+
+
 // Routes
 app.get('/api/user/count', userCtrl.count);
 app.post('/api/user/register', checkSchema(userRegisterSchema), userCtrl.register);
@@ -199,7 +211,8 @@ app.post('/api/user/getOtp', userCtrl.getOtp);
 app.post('/api/user/verifyOtp', userCtrl.verifyOtp);
 
 app.get('/api/user/account', AuthenticateUser, userCtrl.account);
-app.post('/api/user/profilepic', AuthenticateUser, upload.single('profilePic'), userCtrl.updateProfilePic);
+app.post('/api/user/profilePic', AuthenticateUser, upload.single('profilePic'), userCtrl.updateProfilePic);
+app.put('/api/user/update',AuthenticateUser,userCtrl.update)
 
 // Google OAuth Routes
 app.get('/auth/google', (req, res, next) => {
@@ -238,9 +251,14 @@ app.put('/api/rent/placeOrder', AuthenticateUser, AuthorizeUser(['client']), ren
 app.put('/api/rent/:bid/return', AuthenticateUser, AuthorizeUser(['client']), rentCtrl.return);
 app.put('/api/rent/:id/update', AuthenticateUser, rentCtrl.update);
 app.put('/api/rent/:bid/placeSingleOrder', AuthenticateUser, AuthorizeUser(['client']), rentCtrl.placeSingleOrder);
+app.get('/api/rent/orderPlaced',AuthenticateUser,AuthorizeUser(['vendor']),rentCtrl.orderPlaced)
+app.put('/api/rent/:id/toDelivered',AuthenticateUser,AuthorizeUser(['vendor']),rentCtrl.toDelivered)
 
 app.post('/api/review/create', AuthenticateUser, reviewCtrl.create);
 app.get('/api/review/:bid', AuthenticateUser, AuthorizeUser(['client']), reviewCtrl.getBook);
+app.get('/api/review/:rid',AuthenticateUser,reviewCtrl.getReview)
+app.post('/api/review/:rid/upload',AuthenticateUser,AuthorizeUser(['client']),upload.array('photo',5),reviewCtrl.upload)
+
 
 app.get('/api/cart/all', AuthenticateUser, AuthorizeUser(['client']), cartCtrl.listAll);
 app.post('/api/add/:bid/cart', AuthenticateUser, AuthorizeUser(['client']), cartCtrl.addToCart);
@@ -249,6 +267,8 @@ app.delete('/api/cart/:id/remove', AuthenticateUser, AuthorizeUser(['client']), 
 
 app.post('/api/buy/:bid/create', AuthenticateUser, AuthorizeUser(['vendor']), checkSchema(buyValidationSchema), buyCtrl.details);
 app.put('/api/buy/:bid/placeOrder', AuthenticateUser, AuthorizeUser(['client']), buyCtrl.placeOrder);
+app.get('/api/buy/orderPlaced',AuthenticateUser,AuthorizeUser(['vendor']),buyCtrl.orderPlaced)
+app.put('/api/buy/:id/toDelivered',AuthenticateUser,AuthorizeUser(['vendor']),buyCtrl.toDelivered)
 
 app.get('/api/order/my', AuthenticateUser, AuthorizeUser(['client']), orderCtrl.myOrders);
 

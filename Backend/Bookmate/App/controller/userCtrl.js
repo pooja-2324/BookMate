@@ -5,6 +5,8 @@ import Client from '../models/client-model.js'
 import Vendor from '../models/vendor-model.js'
 import dotenv from 'dotenv'
 import upload from "../middleware/multer.js"
+import fs from 'fs'
+import cloudinary from '../../config/cloudinary-profile.js'
 dotenv.config()
 import { validationResult } from 'express-validator';
 import User from "../models/user-model.js";
@@ -191,31 +193,61 @@ userCtrl.verifyOtp = async (req, res) => {
     }
  }
  
- userCtrl.updateProfilePic = async (req, res) => {
-    
-        try {
-            const user = await User.findById(req.currentUser.userId);
-            if (!user) {
-                return res.status(404).json({ error: 'User not found' });
+ 
+
+userCtrl.updateProfilePic = async (req, res) => {
+    try {
+        const user = await User.findById(req.currentUser.userId);
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ error: "No file uploaded" });
+        }
+
+        console.log("Uploading file:", req.file.path);
+
+        // Step 1: Upload image to Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: "profile_pictures", // Ensure images are organized
+        });
+
+        console.log("Cloudinary Upload Success:", result.public_id);
+
+        // Step 2: Delete old profile picture (except the default one)
+        if (user.profilePic?.public_id && user.profilePic.public_id !== "default_profile_cikqzr") {
+            await cloudinary.uploader.destroy(user.profilePic.public_id);
+            console.log("Deleted old profile picture:", user.profilePic.public_id);
+        }
+
+        // Step 3: Update user profile with new image URL
+        user.profilePic = {
+            url: result.secure_url, // Secure URL
+            public_id: result.public_id, // Store public_id for future deletions
+        };
+
+        await user.save();
+
+        res.json(user);
+
+    } catch (err) {
+        console.error("Profile Picture Update Error:", err);
+        res.status(500).json({ error: "Something went wrong in profile updating" });
+    }
+};
+
+    userCtrl.update=async(req,res)=>{
+        try{
+            const body=req.body
+            const user=req.currentUser.userId
+            const result=await User.findByIdAndUpdate({_id:user},body,{new:true,runValidators:true})
+            if(!result){
+                return res.status(404).json({error:'user not found'})
             }
-
-            if (user.profilePic && user.profilePic !== 'profile pic default.jpg') {
-                const oldPicPath = path.join('uploads',user.profilePic);
-                if (fs.existsSync(oldPicPath)) {
-                    fs.unlinkSync(oldPicPath);  // Delete the old profile picture
-                }
-            }
-
-            user.profilePic = req.file.filename;  // Store the new image filename
-            await user.save();
-
-            res.status(201).json({
-                message: 'Profile picture updated successfully',
-                profilePic: user.profilePic  // Return the new profile picture filename
-            });
-        } catch (err) {
-            console.log(err);
-            res.status(500).json({ error: 'Something went wrong' });
+            res.json(result)
+        }catch(err){
+            res.status(500).json({error:'something went wrong'})
         }
     }
 

@@ -78,7 +78,7 @@ bookCtrl.allBooks=async(req,res)=>{
 }
 bookCtrl.verified=async(req,res)=>{
     try{
-        const books=await Book.find({isVerified:true}).populate('vendor')
+        const books=await Book.find({isVerified:true}).populate('vendor').populate('reviews')
         if(!books){
             return res.status(400).json({error:'no books verified'})
         }
@@ -162,7 +162,8 @@ bookCtrl.verify=async(req,res)=>{
 bookCtrl.oneBook=async(req,res)=>{
     try{
         const id=req.params.id
-        const book=await Book.findById(id)
+        const book=await Book.findById(id).populate('reviews')
+        console.log('oneBook',book)
         if(!book){
             return res.status(404).json({error:'book not found'})
         }

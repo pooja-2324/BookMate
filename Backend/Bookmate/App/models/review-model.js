@@ -23,7 +23,12 @@ const reviewSchema=new Schema({
         type:Schema.Types.ObjectId,
         refPath:'reviewFor'
     },
-    photo:String
+    photo:[
+        {
+            url:String,
+            public_id:String
+        }
+    ]
 
 },{timestamps:true})
 const Review=model('Review',reviewSchema)

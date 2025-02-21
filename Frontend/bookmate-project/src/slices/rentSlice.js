@@ -90,7 +90,27 @@ export const placeSingleOrder=createAsyncThunk('rents/placeSingleOrder',async(id
         return rejectWithValue(err.response.data.error)
     }
 })
+export const currentRentBooks=createAsyncThunk('rents/currentRentBooks',async(_,{rejectWithValue})=>{
+    try{
+        const response=await axios.get('/api/rent/orderPlaced',{
+            headers:{Authorization:localStorage.getItem('token')}
+        })
+        return response.data
+    }catch(err){
+        console.log(err)
+        return rejectWithValue(err.response.data.error)
+    }
+})
+export const toDelivered=createAsyncThunk('rents/toDelivered',async(id,{rejectWithValue})=>{
+    try{
+        const response=await axios.put(`/api/rent/${id}/toDelivered`,{},{
+            headers:{Authorization:localStorage.getItem('token')}
+        })
+        return response.data
+    }catch(err){
 
+    }
+})
 const rentSlice=createSlice({
     name:'rents',
     initialState:{
@@ -129,7 +149,7 @@ const rentSlice=createSlice({
             state.serverError=action.payload
         })
         builder.addCase(activeRent.fulfilled,(state,action)=>{
-            console.log('rentdataslice',action.payload)
+            console.log('activerent',action.payload)
             state.rentData=action.payload
         })
         builder.addCase(activeRent.rejected,(state,action)=>{
@@ -156,7 +176,22 @@ const rentSlice=createSlice({
         builder.addCase(placeSingleOrder.rejected,(state,action)=>{
             state.serverError=action.payload
         })
-       
+       builder.addCase(currentRentBooks.fulfilled,(state,action)=>{
+        console.log('currentBooks',state.rentData)
+        state.rentData=action.payload
+        state.serverError=null
+       })
+       builder.addCase(currentRentBooks.rejected,(state,action)=>{
+        state.serverError=action.payload
+       })
+       builder.addCase(toDelivered.fulfilled,(state,action)=>{
+        state.rentData=action.payload
+        console.log('delivered',state.rentData)
+        state.serverError=null
+       })
+       builder.addCase(toDelivered.rejected,(state,action)=>{
+        state.serverError=action.payload
+       })
 
     }
 })

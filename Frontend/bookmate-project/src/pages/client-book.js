@@ -27,6 +27,7 @@ export default function ClientBook(){
             <th>ReturnedDate</th>
             <th>LateFee</th>
             <th>DamageFee</th>
+            
         </tr>
         </thead>
         <tbody>

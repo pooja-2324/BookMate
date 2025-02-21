@@ -14,6 +14,9 @@ export default function AuthProvider(props){
     const handleLogout=()=>{
         userDispatch({type:'LOGOUT',payload:{isLoggedIn:false,user:null}})
     }
+    const handleUpdate=(user)=>{
+        userDispatch({type:'UPDATE_USER',payload:{isLoggedIn:true,user:user}})
+    }
     useEffect(()=>{
         (async()=>{
             try{
@@ -33,7 +36,7 @@ export default function AuthProvider(props){
     
     return(
         <div>
-            <AuthContext.Provider value={{handleLogin,handleLogout,userState}}>
+            <AuthContext.Provider value={{handleLogin,handleLogout,userState,handleUpdate}}>
                 {props.children}
             </AuthContext.Provider>
         </div>

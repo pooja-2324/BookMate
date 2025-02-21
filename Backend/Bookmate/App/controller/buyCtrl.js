@@ -79,5 +79,33 @@ import { validationResult } from "express-validator";
         res.status(500).json({error:'something went wrong'})
     }
  }
+ buyCtrl.orderPlaced=async(req,res)=>{
+    try{
+        const vendor=req.currentUser.userId
+        const books=await Buy.find({deliveryStatus:'order placed',vendor}).populate('client').populate('book')
+        if(!books){
+            return res.status(404).json({error:'books not found'})
+        }
+        res.json(books)
+    }catch(err){
+        console.log(err)
+        res.status(500).json({error:'something went wrong'})
+    }
+ }
+ buyCtrl.toDelivered=async(req,res)=>{
+    try{
+      const id=req.params.id
+      const vendor=req.currentUser.userId
+      const buy=await Buy.findOneAndUpdate({_id:id,vendor},{deliveryStatus:'delivered'},{new:true,runValidators:true})
+      if(!buy){
+      return res.status(404).json({error:'buy not found'})
+      }
+      res.json(buy)
+  
+    }catch(err){
+      console.log(err)
+      res.status(500).json({error:'something went wrong'})
+    }
+  }
 
  export default buyCtrl
