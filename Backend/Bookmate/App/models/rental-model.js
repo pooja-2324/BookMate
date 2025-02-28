@@ -22,7 +22,7 @@ const rentSchema=new Schema({
     returnedDate:Date,
     rentedBookStatus:{
           type:String,
-          enum:["active","completed","late"]
+          enum:["active",'returnPending',"completed","late"]
          },
 
     pricing:{
@@ -32,12 +32,15 @@ const rentSchema=new Schema({
           platformFee:Number 
          },
          lateFee:Number,
-          damageFee:Number,
+          damageFee:{
+            type:Number,
+            default:50
+          },
       totalAmountToPay:Number ,//cautionDeposit + readingFee + platformFee + deliveryFee
       isDamaged:Boolean,
       deliveryStatus:{
             type:String,
-            enum:['order placed','delivered','returned']
+            enum:['pending','order placed','delivered','returned']
       },
       updatedAt:{
             type:Date,

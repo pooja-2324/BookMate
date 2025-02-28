@@ -8,6 +8,7 @@ const vendorSchema=new Schema({
         type:Boolean,
         default:false
     },
+    stripeAccountId:String,
     uploadedBooks:[{type:Schema.Types.ObjectId,ref:'Book'}],
     totalEarnings:[{
         book:{
@@ -21,7 +22,10 @@ const vendorSchema=new Schema({
     //     ref:'Review'
     // }]
 
-
+    balance:{
+        type:Number,
+        default:0
+    },
 },{timestamps:true})
 
 const Vendor=model('Vendor',vendorSchema)

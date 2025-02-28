@@ -167,6 +167,7 @@
 import { useContext, useState, useRef } from "react";
 import AuthContext from "../context/authContext";
 import axios from "../config/axios";
+import {AiOutlineMoneyCollect,AiOutlineBook} from 'react-icons/ai'
 
 export default function Profile() {
     const { userState, handleUpdate } = useContext(AuthContext);
@@ -254,9 +255,14 @@ export default function Profile() {
                             <a href="/my-orders">My Orders</a>
                         </li>
                     ) : (
+                        <ul>
                         <li className="py-2 hover:bg-red-700 px-4 rounded">
-                            <a href="/my-earnings">My Earnings</a>
+                            <a href="/earnings"><AiOutlineMoneyCollect size={24}/> My Earnings</a>
                         </li>
+                        <li className="py-2 hover:bg-red-700 px-4 rounded">
+                            <a href="/vhome"><AiOutlineBook size={24}/> My Books</a>
+                        </li>
+                        </ul>
                     )}
                 </ul>
             </aside>

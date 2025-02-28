@@ -111,6 +111,17 @@ export const toDelivered=createAsyncThunk('rents/toDelivered',async(id,{rejectWi
 
     }
 })
+export const pendingRents=createAsyncThunk('rents/pendingRents',async(_,{rejectWithValue})=>{
+    try{
+        const response=await axios.get('/api/rent/pending',{
+            headers:{Authorization:localStorage.getItem('token')}
+        })
+        return response.data
+    }catch(err){
+        console.log(err)
+        return rejectWithValue(err.response.data.error)
+    }
+})
 const rentSlice=createSlice({
     name:'rents',
     initialState:{
@@ -190,6 +201,12 @@ const rentSlice=createSlice({
         state.serverError=null
        })
        builder.addCase(toDelivered.rejected,(state,action)=>{
+        state.serverError=action.payload
+       })
+       builder.addCase(pendingRents.fulfilled,(state,action)=>{
+        state.rentData=action.payload
+       })
+       builder.addCase(pendingRents.rejected,(state,action)=>{
         state.serverError=action.payload
        })
 

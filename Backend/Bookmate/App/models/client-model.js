@@ -25,11 +25,16 @@ const clientSchema=new Schema({
 
         }
     }],
-    wallet:Number,
+    refund:{
+        type:Number,
+        default:0
+    },
     reviews:[{
         type:Schema.Types.ObjectId,
         ref:"Review"
-    }]
+    }],
+    paymentIntent:String,
+
 
 },{timestamps:true})
 const Client=model('Client',clientSchema)

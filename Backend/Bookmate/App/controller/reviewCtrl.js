@@ -107,8 +107,8 @@ reviewCtrl.upload = async (req, res) => {
   try {
     console.log('file',req.files)
     try{
-      const {rid}=req.params
-      const review=await Review.findById(rid)
+      const id=req.params.rid
+      const review=await Review.findById(id)
       console.log('review',review)
       if(!review){
         return res.status(404).json({error:'review not found'})

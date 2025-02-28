@@ -1,5 +1,6 @@
 
 import './App.css';
+
 import PrivateRoute from './components/privateRoute';
 import Login from './pages/login';
 import Register from './pages/register';
@@ -26,8 +27,15 @@ import VerifyOtp from './pages/otp-verify';
 import Profile from './pages/profile';
 import CurrentBooks from './pages/v-currentBooks';
 import ReviewPhotos from './pages/review-photo';
+import PaymentFailed from './pages/payment-failed'
+import PaymentSuccess from './pages/payment-success'
+import ReturnAccept from './pages/v-returnAccept';
+
+
+import Payment from './pages/payment';
 
 import { Link,Route,Routes, useNavigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify'
 import { useContext,useState } from 'react';
 import AuthContext from './context/authContext';
 function App() {
@@ -44,18 +52,7 @@ function App() {
      </>:<></>}
       {}
       
-        {userState&&userState.isLoggedIn?<>
-        {userState.user.role=='vendor'&&<li><Link to ='/vdashboard'>VDashboard</Link></li>}
-        {userState.user.role=='vendor'&&<li><Link to="/vhome">MyBooks</Link></li>}
-        {userState.user.role=='vendor'&&<li><Link to='/calender'>DueDateCalender</Link></li>}
-        {userState.user.role=='vendor'&&<li><Link to='/clientBook'>ClientBook</Link></li>}
-        {userState.user.role=='vendor'&&<li><Link to='/currentBooks'>CurrentBooks</Link></li>}
-
-
         
-        
-        
-       </>:<></>}
        {/* <li><Link to="/login">Login</Link></li>
           <li><Link to="/register">Register</Link></li> */}
        
@@ -90,8 +87,14 @@ function App() {
         <Route path='/profile' element={<PrivateRoute><Profile/></PrivateRoute>}/>
         <Route path='/currentBooks' element={<PrivateRoute><CurrentBooks/></PrivateRoute>}/>
         <Route path='/review-photo/:rid' element={<PrivateRoute><ReviewPhotos/></PrivateRoute>}/>
+        
+        <Route path='/make-payment' element={<PrivateRoute><Payment/></PrivateRoute>}/>
+        <Route path='/payment/success'element={<PrivateRoute><PaymentSuccess/></PrivateRoute>}/>
+        <Route path="/payment/failed" element={<PrivateRoute><PaymentFailed/></PrivateRoute>}/>
+        <Route path='/accept' element={<PrivateRoute><ReturnAccept/></PrivateRoute>}/>
+        
       </Routes>
-      
+      <ToastContainer />
     </div>
   );
 }

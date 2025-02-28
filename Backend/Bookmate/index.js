@@ -155,6 +155,7 @@ import clientCtrl from "./App/controller/clientCtrl.js";
 import buyCtrl from "./App/controller/buyCtrl.js";
 import orderCtrl from "./App/controller/orderCtrl.js";
 import cartCtrl from "./App/controller/cartCtrl.js";
+import paymentCtrl from "./App/controller/paymentCtrl.js";
 
 import { userRegisterSchema } from "./App/validations/user-Validation.js";
 import { userLoginSchema } from "./App/validations/user-Validation.js";
@@ -232,6 +233,7 @@ app.get('/api/client/:id', AuthenticateUser, clientCtrl.oneClient);
 
 app.get('/api/vendor/allVendors', AuthenticateUser, AuthorizeUser(['admin']), vendorCtrl.allVendors);
 app.get('/api/vendor/earnings', AuthenticateUser, AuthorizeUser(['vendor']), vendorCtrl.earnings);
+app.post('/api/vendor/acceptReturn',AuthenticateUser,vendorCtrl.acceptReturn)
 app.get('/api/vendor/:id', AuthenticateUser, AuthorizeUser(['admin']), vendorCtrl.oneVendor);
 
 app.post('/api/book/create', AuthenticateUser, AuthorizeUser(['vendor']), checkSchema(bookCreateSchema), checkSchema(AccountStatus), bookCtrl.create);
@@ -248,6 +250,7 @@ app.post('/api/book/:bid/rent/create', AuthenticateUser, AuthorizeUser(['vendor'
 app.get('/api/rent/active', AuthenticateUser, AuthorizeUser(['vendor', 'admin']), rentCtrl.active);
 app.get('/api/book/:bid/rent', AuthenticateUser, AuthorizeUser(['admin', 'vendor', 'client']), rentCtrl.rentDetails);
 app.put('/api/rent/placeOrder', AuthenticateUser, AuthorizeUser(['client']), rentCtrl.bothPlaceOrder);
+app.get('/api/rent/pending',AuthenticateUser,rentCtrl.pending)
 app.put('/api/rent/:bid/return', AuthenticateUser, AuthorizeUser(['client']), rentCtrl.return);
 app.put('/api/rent/:id/update', AuthenticateUser, rentCtrl.update);
 app.put('/api/rent/:bid/placeSingleOrder', AuthenticateUser, AuthorizeUser(['client']), rentCtrl.placeSingleOrder);
@@ -272,6 +275,11 @@ app.put('/api/buy/:id/toDelivered',AuthenticateUser,AuthorizeUser(['vendor']),bu
 
 app.get('/api/order/my', AuthenticateUser, AuthorizeUser(['client']), orderCtrl.myOrders);
 
+
+// app.post('/api/payment/order/:oid/create',AuthenticateUser,paymentCtrl.create)
+// app.put('/api/payment/order/:oid/confirm',AuthenticateUser,paymentCtrl.confirm)
+app.post('/api/payment/initialPay',AuthenticateUser,paymentCtrl.pay)
+app.get('/api/paymentDetails',AuthenticateUser,paymentCtrl.getPaymentDetails)
 // Start Server
 app.listen(process.env.PORT, () => {
     console.log('server is listening on port', process.env.PORT);

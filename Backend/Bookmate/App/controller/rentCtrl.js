@@ -83,183 +83,219 @@ rentCtrl.rentDetails=async(req,res)=>{
 
 
 
-
-// Place Order for All Books in the Cart
 // rentCtrl.bothPlaceOrder = async (req, res) => {
 //   try {
 //     const clientId = req.currentUser.userId;
 
 //     // Find all cart items for the client
-//     const cartItems = await Cart.find({ client: clientId }).populate("book").populate("rent").populate('buy');
+//     const cartItems = await Cart.find({ client: clientId }).populate("book").populate("rent").populate("buy");
 
 //     if (cartItems.length === 0) {
 //       return res.status(400).json({ error: "Your cart is empty." });
 //     }
 
 //     const orders = [];
-
+//     let newOrder
 //     for (const item of cartItems) {
-//       const { book, rent ,buy} = item;
-//       if(book.status=='notAvailable'||book.status=='withdrawn'){
-//         return res.status(404).json({error:`Book ${book.modifiedTitle} is not available`})
+//       const { book, rent, buy } = item;
+
+//       if (book.status === 'notAvailable' || book.status === 'withdrawn') {
+//         return res.status(404).json({ error: `Book ${book.modifiedTitle} is not available` });
 //       }
 
-//       if (!rent || rent.rentedBookStatus === "active") {
-//         return res.status(400).json({ error: `Order already placed for book ${book.modifiedTitle}` });
-//       }
+//       // Processing Rent Order
+//       if (rent) {
+//         if (rent.rentedBookStatus === "active") {
+//           return res.status(400).json({ error: `Order already placed for book ${book.modifiedTitle}` });
+//         }
 
-//       // Set rental start date and due date
-//       const rentalStartDate = new Date();
-//       const dueDate = new Date(rentalStartDate);
-//       dueDate.setDate(rentalStartDate.getDate() + rent.period);
+//         // Set rental start date and due date
+//         const rentalStartDate = new Date();
+//         const dueDate = new Date(rentalStartDate);
+//         dueDate.setDate(rentalStartDate.getDate() + rent.period);
 
-//       // Update Rent details
-//       await Rent.findByIdAndUpdate(rent._id, {
-//         client: clientId,
-//         rentalStartDate,
-//         dueDate,
-//         rentedBookStatus: "active",
-//         deliveryStatus: "order placed"
-//       });
+//         // Update Rent details
+//         await Rent.findByIdAndUpdate(rent._id, {
+//           client: clientId,
+//           // rentalStartDate,
+//           // dueDate,
+//           rentedBookStatus: "active",
+//           deliveryStatus: "order placed"
+//         });
 
-//       // Update Book details: Set status to 'notAvailable' and increment rentCount
-//       await Book.findByIdAndUpdate(
-//         book._id,
-//         {
-//           $set: { status: "notAvailable" },
-//           $inc: { rentCount: 1 }
-//         },
-//         { new: true }
-//       );
+//         // Update Book details: Set status to 'notAvailable' and increment rentCount
+//         const updateRentBook=await Book.findByIdAndUpdate(
+//           book._id,
+//           {
+//             $set: { status: "notAvailable" },
+//             $inc: { rentCount: 1 }
+//           },
+//           { new: true }
+//         );
+//         console.log('update rentbook',updateRentBook)
 
-//       // Update Client details
-//       await Client.findOneAndUpdate(
-//         { client: clientId },
-//         {
-//           $push: {
-//             rentedBooks: {
-//               $each: [
-//                 {
-//                   book: book._id,
-//                   rent: rent._id
-//                 }
-//               ],
-//               $position: 0 // Insert at the beginning of the array
+//         // Update Client details
+//         await Client.findOneAndUpdate(
+//           { client: clientId },
+//           {
+//             $push: {
+//               rentedBooks: {
+//                 $each: [
+//                   {
+//                     book: book._id,
+//                     rent: rent._id
+//                   }
+//                 ],
+//                 $position: 0 // Insert at the beginning of the array
+//               }
 //             }
-//           }
-//         }
-//       );
-
-      
-// const vendor = await Vendor.findOne({ vendor: book.vendor });
-
-// if (!vendor) {
-//   console.log("Vendor not found for book:", book._id);
-//   continue; // Skip this iteration if vendor not found
-// }
-
-// // Check if the book already exists in `totalEarnings`
-// const existingEarningsIndex = vendor.totalEarnings?.findIndex(
-//   (entry) => entry.book.toString() === book._id.toString()
-// );
-
-// if (existingEarningsIndex > -1) {
-//   console.log("Updating existing earnings for book:", book._id);
-  
-//   // If book exists, increment earnings
-//   await Vendor.findOneAndUpdate(
-//     { _id: vendor._id, "totalEarnings.book": book._id },
-//     { $inc: { "totalEarnings.$.earnings": rent.pricing.readingFee } },
-//     { new: true }
-//   );
-// } else {
-//   console.log("Adding new earnings entry for book:", book._id);
-  
-//   // If the book doesn't exist in `totalEarnings`, push a new entry
-//   await Vendor.findByIdAndUpdate(
-//     vendor._id,
-//     {
-//       $push: {
-//         totalEarnings: {
-//           book: book._id,
-//           earnings: rent.pricing.readingFee
-//         }
-//       }
-//     },
-//     { new: true }
-//   );
-// }
-
-
-
-//       orders.push({
-//         type:'rent',
-//         book: book.title,
-//         rentalStartDate,
-//         dueDate,
-//         pricing: rent.pricing
-//       });
-//     }
-//     if(buy){
-//       await Buy.findByIdAndUpdate(buy._id,{
-//         client:clientId,
-//         deliveryStatus:'orderPlaced'
-//       })
-//       await Book.findByIdAndUpdate(book._id,{status:'notAvailable'})
-//       await Client.findOneAndUpdate(
-//         { _id: clientId },
-//         {
-//           $push: {
-//             purchasedBooks: {
-//               book: book._id,
-//               buyingDetails: buy._id
-//             }
-//           }
-//         }
-//       );
-//       const vendor = await Vendor.findOne({ _id: book.vendor });
-//       if (vendor) {
-//         const existingEarningsIndex = vendor.totalEarnings?.findIndex(
-//           (entry) => entry.book.toString() === book._id.toString()
+//           },
+//           {new:true}
 //         );
 
-//         if (existingEarningsIndex > -1) {
-//           await Vendor.findOneAndUpdate(
-//             { _id: vendor._id, "totalEarnings.book": book._id },
-//             { $inc: { "totalEarnings.$.earnings": buy.sellPrice } },
-//             { new: true }
+//         const vendor = await Vendor.findOne({ vendor: book.vendor }).populate('vendor');
+
+//         if (vendor) {
+//           // Check if the book already exists in `totalEarnings`
+//           const existingEarningsIndex = vendor.totalEarnings?.findIndex(
+//             (entry) => entry.book.toString() === book._id.toString()
 //           );
-//         } else {
-//           await Vendor.findByIdAndUpdate(
-//             vendor._id,
-//             {
-//               $push: {
-//                 totalEarnings: {
-//                   book: book._id,
-//                   earnings: buy.sellPrice
+
+//           if (existingEarningsIndex > -1) {
+//             // If book exists, increment earnings
+//             await Vendor.findOneAndUpdate(
+//               { _id: vendor._id, "totalEarnings.book": book._id },
+//               { $inc: { "totalEarnings.$.earnings": rent.pricing.readingFee } },
+//               { new: true }
+//             );
+//           } else {
+//             // If the book doesn't exist in `totalEarnings`, push a new entry
+//             await Vendor.findByIdAndUpdate(
+//               vendor._id,
+//               {
+//                 $push: {
+//                   totalEarnings: {
+//                     book: book._id,
+//                     earnings: rent.pricing.readingFee
+//                   }
 //                 }
-//               }
-//             },
-//             { new: true }
-//           );
+//               },
+//               { new: true }
+//             );
+//           }
+//           await notifyVendor(vendor.vendor.email,{
+//            book: book.modifiedTitle,
+//            rentalStartDate,
+//            dueDate,
+//            type:'rent',
+//            pricing:rent.pricing
+//           })
 //         }
+//          newOrder=await Order.create({
+//           vendor: book.vendor,
+//           book: book._id,
+//           rent: rent._id,
+//           client: clientId,
+//           vendor:book.vendor,
+//           totalAmount:rent.pricing.deliveryFee+rent.pricing.cautionDeposit+rent.pricing.platformFee+rent.pricing.readingFee
+//         });
+//         orders.push({
+//           type: 'rent',
+//           book: book.title,
+//           rentalStartDate,
+//           dueDate,
+//           pricing: rent.pricing
+//         });
 //       }
-//       orders.push({
-//         type: "buy",
-//         book: book.title,
-//         pricing: { sellPrice: buy.sellPrice }
-//       });
-    
+
+//       // Processing Buy Order
+//       if (buy) {
+//         await Buy.findByIdAndUpdate(buy._id, {
+//           client: clientId,
+//           deliveryStatus: 'orderPlaced'
+//         });
+
+//         const updateBuyBook=await Book.findByIdAndUpdate(book._id, { status: 'notAvailable' });
+//         console.log('update buyBook',updateBuyBook)
+
+//         await Client.findOneAndUpdate(
+//           { client: clientId },
+//           {
+//             $push: {
+//               purchasedBooks: {
+//                 $each: [
+//                   {
+//                     book: book._id,
+//                     buyingDetails: buy._id
+//                   }
+//                 ],
+//                 $position: 0 // Insert at the beginning of the array
+//               }
+//             }
+//           },
+//           {new:true}
+//         );
+
+//         const vendor = await Vendor.findOne({ vendor: book.vendor });
+//         if (vendor) {
+//           const existingEarningsIndex = vendor.totalEarnings?.findIndex(
+//             (entry) => entry.book.toString() === book._id.toString()
+//           );
+
+//           if (existingEarningsIndex > -1) {
+//            const buyVendor1= await Vendor.findOneAndUpdate(
+//               { _id: vendor._id, "totalEarnings.book": book._id },
+//               { $inc: { "totalEarnings.$.earnings": buy.sellPrice } },
+//               {upsert:true,new: true }
+//             );
+//             console.log('buy vendor1',buyVendor1)
+//           } else {
+//            const buyVendor= await Vendor.findByIdAndUpdate(
+//               vendor._id,
+//               {
+//                 $push: {
+//                   totalEarnings: {
+//                     book: book._id,
+//                     earnings: buy.sellPrice
+//                   }
+//                 }
+//               },
+//               { new: true }
+//             );
+//             console.log('buy vendor',buyVendor)
+//           }
+//           await notifyVendor(vendor.vendor.email,{
+//             book: book.modifiedTitle,
+            
+//             type:'buy',
+//             pricing:{sellPrice:buy.sellPrice}
+//            })
+//         }
+//          newOrder=await Order.create({
+//           vendor: book.vendor,
+//           book: book._id,
+//           buy: buy._id,
+//           client: clientId,
+//           totalAmount:buy.sellPrice
+//         });
+//         orders.push({
+//           type: "buy",
+//           book: book.title,
+//           pricing: { sellPrice: buy.sellPrice }
+//         });
+//       }
 //     }
+    
 //     // Clear cart after placing order
 //     await Cart.deleteMany({ client: clientId });
 
-//     res.json({ message: "Order placed successfully", orders });
+//     res.json({ message: "Order placed successfully", newOrder });
 //   } catch (err) {
 //     console.log(err);
-//     res.status(500).json({ error: "Something went wrong",err });
+//     res.status(500).json({ error: "Something went wrong", err });
 //   }
 // };
+
 rentCtrl.bothPlaceOrder = async (req, res) => {
   try {
     const clientId = req.currentUser.userId;
@@ -272,7 +308,7 @@ rentCtrl.bothPlaceOrder = async (req, res) => {
     }
 
     const orders = [];
-
+    let newOrder;
     for (const item of cartItems) {
       const { book, rent, buy } = item;
 
@@ -286,171 +322,30 @@ rentCtrl.bothPlaceOrder = async (req, res) => {
           return res.status(400).json({ error: `Order already placed for book ${book.modifiedTitle}` });
         }
 
-        // Set rental start date and due date
-        const rentalStartDate = new Date();
-        const dueDate = new Date(rentalStartDate);
-        dueDate.setDate(rentalStartDate.getDate() + rent.period);
-
-        // Update Rent details
-        await Rent.findByIdAndUpdate(rent._id, {
-          client: clientId,
-          rentalStartDate,
-          dueDate,
-          rentedBookStatus: "active",
-          deliveryStatus: "order placed"
-        });
-
-        // Update Book details: Set status to 'notAvailable' and increment rentCount
-        const updateRentBook=await Book.findByIdAndUpdate(
-          book._id,
-          {
-            $set: { status: "notAvailable" },
-            $inc: { rentCount: 1 }
-          },
-          { new: true }
-        );
-        console.log('update rentbook',updateRentBook)
-
-        // Update Client details
-        await Client.findOneAndUpdate(
-          { client: clientId },
-          {
-            $push: {
-              rentedBooks: {
-                $each: [
-                  {
-                    book: book._id,
-                    rent: rent._id
-                  }
-                ],
-                $position: 0 // Insert at the beginning of the array
-              }
-            }
-          },
-          {new:true}
-        );
-
-        const vendor = await Vendor.findOne({ vendor: book.vendor }).populate('vendor');
-
-        if (vendor) {
-          // Check if the book already exists in `totalEarnings`
-          const existingEarningsIndex = vendor.totalEarnings?.findIndex(
-            (entry) => entry.book.toString() === book._id.toString()
-          );
-
-          if (existingEarningsIndex > -1) {
-            // If book exists, increment earnings
-            await Vendor.findOneAndUpdate(
-              { _id: vendor._id, "totalEarnings.book": book._id },
-              { $inc: { "totalEarnings.$.earnings": rent.pricing.readingFee } },
-              { new: true }
-            );
-          } else {
-            // If the book doesn't exist in `totalEarnings`, push a new entry
-            await Vendor.findByIdAndUpdate(
-              vendor._id,
-              {
-                $push: {
-                  totalEarnings: {
-                    book: book._id,
-                    earnings: rent.pricing.readingFee
-                  }
-                }
-              },
-              { new: true }
-            );
-          }
-          await notifyVendor(vendor.vendor.email,{
-           book: book.modifiedTitle,
-           rentalStartDate,
-           dueDate,
-           type:'rent',
-           pricing:rent.pricing
-          })
-        }
-        await Order.create({
+        newOrder = await Order.create({
           vendor: book.vendor,
           book: book._id,
           rent: rent._id,
-          client: clientId
+          client: clientId,
+          totalAmount: rent.pricing.deliveryFee + rent.pricing.cautionDeposit + rent.pricing.platformFee + rent.pricing.readingFee,
+          status: 'pending' // Set status to pending
         });
         orders.push({
           type: 'rent',
           book: book.title,
-          rentalStartDate,
-          dueDate,
           pricing: rent.pricing
         });
       }
 
       // Processing Buy Order
       if (buy) {
-        await Buy.findByIdAndUpdate(buy._id, {
-          client: clientId,
-          deliveryStatus: 'orderPlaced'
-        });
-
-        const updateBuyBook=await Book.findByIdAndUpdate(book._id, { status: 'notAvailable' });
-        console.log('update buyBook',updateBuyBook)
-
-        await Client.findOneAndUpdate(
-          { client: clientId },
-          {
-            $push: {
-              purchasedBooks: {
-                $each: [
-                  {
-                    book: book._id,
-                    buyingDetails: buy._id
-                  }
-                ],
-                $position: 0 // Insert at the beginning of the array
-              }
-            }
-          },
-          {new:true}
-        );
-
-        const vendor = await Vendor.findOne({ vendor: book.vendor });
-        if (vendor) {
-          const existingEarningsIndex = vendor.totalEarnings?.findIndex(
-            (entry) => entry.book.toString() === book._id.toString()
-          );
-
-          if (existingEarningsIndex > -1) {
-           const buyVendor1= await Vendor.findOneAndUpdate(
-              { _id: vendor._id, "totalEarnings.book": book._id },
-              { $inc: { "totalEarnings.$.earnings": buy.sellPrice } },
-              {upsert:true,new: true }
-            );
-            console.log('buy vendor1',buyVendor1)
-          } else {
-           const buyVendor= await Vendor.findByIdAndUpdate(
-              vendor._id,
-              {
-                $push: {
-                  totalEarnings: {
-                    book: book._id,
-                    earnings: buy.sellPrice
-                  }
-                }
-              },
-              { new: true }
-            );
-            console.log('buy vendor',buyVendor)
-          }
-          await notifyVendor(vendor.vendor.email,{
-            book: book.modifiedTitle,
-            
-            type:'buy',
-            pricing:{sellPrice:buy.sellPrice}
-           })
-        }
-        await Order.create({
+        newOrder = await Order.create({
           vendor: book.vendor,
           book: book._id,
           buy: buy._id,
-          client: clientId
+          client: clientId,
+          totalAmount: buy.sellPrice,
+          status: 'pending' // Set status to pending
         });
         orders.push({
           type: "buy",
@@ -460,17 +355,12 @@ rentCtrl.bothPlaceOrder = async (req, res) => {
       }
     }
 
-    // Clear cart after placing order
-    await Cart.deleteMany({ client: clientId });
-
-    res.json({ message: "Order placed successfully", orders });
+    res.json( newOrder );
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "Something went wrong", err });
   }
 };
-
-
 
 
 
@@ -488,38 +378,121 @@ rentCtrl.return=async(req,res)=>{
         console.log('rd dd',returnDate,rent.dueDate)
         console.log('sub',returnDate - rent.dueDate)
         const lateFee = rent.dueDate < returnDate ? (returnDate - rent.dueDate) / (1000 * 60 * 60 * 24) * 10 : 0; // Calculate late fee for each day over due date
-        const damageFee = rent.isDamaged ? 30 : 0
+        
         await Rent.findByIdAndUpdate(rent._id,{
-            rentedBookStatus:'completed',
+            rentedBookStatus:'returnPending',
             returnedDate:new Date(),
             lateFee,
-            damageFee
-        })
-        await Book.findByIdAndUpdate(rent.book, { status: 'available' });
-        const additionalEarnings = rent.pricing.readingFee + lateFee + damageFee;
-    const vendor = await Vendor.findOne({ vendor: rent.vendor });
+           
+        },{new:true})
+       // await Book.findByIdAndUpdate(rent.book, { status: 'available' });
+        //const additionalEarnings = rent.pricing.readingFee + lateFee 
+    // const vendor = await Vendor.findOne({ vendor: rent.vendor });
 
-    const bookEarningIndex = vendor.totalEarnings.findIndex(
-      (entry) => entry.book?.toString() === rent.book?.toString()
-    );
+    // const bookEarningIndex = vendor.totalEarnings.findIndex(
+    //   (entry) => entry.book?.toString() === rent.book?.toString()
+    // );
 
-    if (bookEarningIndex > -1) {
-      // Update earnings for the specific book
-      vendor.totalEarnings[bookEarningIndex].earnings += additionalEarnings;
-    } else {
-      // Add a new entry for this book if it doesn't exist
-      vendor.totalEarnings.push({
-        book: rent.book,
-        earnings: additionalEarnings,
-      });
-    }
-        res.json({message:'book returned successfully'})
+    // if (bookEarningIndex > -1) {
+    //   // Update earnings for the specific book
+    //   vendor.totalEarnings[bookEarningIndex].earnings += additionalEarnings;
+    // } else {
+    //   // Add a new entry for this book if it doesn't exist
+    //   vendor.totalEarnings.push({
+    //     book: rent.book,
+    //     earnings: additionalEarnings,
+    //   });
+    // }
+        res.json({message:'book returned successfully',rentId:rent._id})
     }catch(err){
         console.log(err)
-        res.status(500).json({error:'something went wrong'})
+        res.status(500).json({error:'something went wrong in accept'})
     }
 }
+// rentCtrl.return = async (req, res) => {
+//   try {
+//     const { bid } = req.params;
 
+//     // Fetch rent details
+//     const rent = await Rent.findOne({ book: bid }).populate("vendor client book");
+//     if (!rent) {
+//       return res.status(404).json({ error: "Rent details not found" });
+//     }
+
+//     // Calculate late fee and damage fee
+//     const returnDate = new Date();
+//     const lateFee =
+//       rent.dueDate < returnDate
+//         ? Math.ceil((returnDate - rent.dueDate) / (1000 * 60 * 60 * 24)) * 10 // 10/- per day
+//         : 0;
+//     const damageFee = rent.isDamaged ? 30 : 0; // 30/- damage fee
+
+//     // Update rent details
+//     await Rent.findByIdAndUpdate(rent._id, {
+//       rentedBookStatus: "completed",
+//       returnedDate: returnDate,
+//       lateFee,
+//       damageFee,
+//     });
+
+//     // Update book status to available
+//     await Book.findByIdAndUpdate(rent.book, { status: "available" });
+
+//     // Calculate total earnings for the vendor
+//     const additionalEarnings = rent.pricing.readingFee + lateFee + damageFee;
+
+//     // Update vendor's total earnings
+//     const vendor = await Vendor.findOne({ vendor: rent.vendor });
+//     const bookEarningIndex = vendor.totalEarnings.findIndex(
+//       (entry) => entry.book?.toString() === rent.book?.toString()
+//     );
+
+//     if (bookEarningIndex > -1) {
+//       // Update earnings for the specific book
+//       vendor.totalEarnings[bookEarningIndex].earnings += additionalEarnings;
+//     } else {
+//       // Add a new entry for this book if it doesn't exist
+//       vendor.totalEarnings.push({
+//         book: rent.book,
+//         earnings: additionalEarnings,
+//       });
+//     }
+//     await vendor.save();
+
+//     // Fetch the initial payment intent ID
+//     const payment = await Payment.findOne({ orderId: rent.orderId });
+//     if (!payment || !payment.transactionId) {
+//       return res.status(404).json({ error: "Payment record not found" });
+//     }
+
+//     // Step 1: Refund caution deposit (100/-) to the client
+//     const refund = await stripe.refunds.create({
+//       payment_intent: payment.transactionId, // Payment Intent ID from the initial charge
+//       amount: 10000, // 100/- in paise
+//       reason: "requested_by_customer", // Refund reason
+//     });
+
+//     console.log("Refund ID:", refund.id);
+
+//     // Step 2: Transfer reading fee, late fee, and damage fee to the vendor
+//     const transfer = await stripe.transfers.create({
+//       amount: additionalEarnings * 100, // Convert to paise
+//       currency: "inr",
+//       destination: vendor.stripeAccountId, // Vendor's Stripe Connected Account ID
+//       description: `Transfer for book ${rent.book.title}`,
+//     });
+
+//     console.log("Transfer ID:", transfer.id);
+
+//     // Step 3: Retain platform fee and delivery charges by the admin
+//     // No action needed here since the admin already has the funds.
+
+//     res.json({ message: "Book returned successfully", refund, transfer });
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).json({ error: "Something went wrong" });
+//   }
+// };
 
 rentCtrl.earnings = async (req, res) => {
     try {
@@ -783,6 +756,19 @@ export const notifyDueDates=async()=>{
   }
   }catch(err){
     console.log(err)
+  }
+}
+rentCtrl.pending=async(req,res)=>{
+  try{
+    const vendor=req.currentUser.userId
+    const rent=await Rent.find({rentedBookStatus:'returnPending',vendor}).populate('book').populate('client')
+    if(!rent){
+      return res.status(404).json({error:'rent not found'})
+    }
+    res.json(rent)
+  }catch(err){
+    console.log(err)
+    res.status(500).json({error:'somethng went wrong in fetch pendingRent'})
   }
 }
 export default rentCtrl

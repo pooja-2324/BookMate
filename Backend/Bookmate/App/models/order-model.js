@@ -16,7 +16,12 @@ const orderSchema=new Schema({
     client:{
         type:Schema.Types.ObjectId,
         ref:'User'
-    }
+    },
+    vendor:{
+        type:Schema.Types.ObjectId,
+        ref:'User'
+    },
+    totalAmount:Number
 },{timestamps:true})
 
 const Order=model('Order',orderSchema)

@@ -282,6 +282,7 @@
 // }
 
 
+
 import { useSelector, useDispatch } from "react-redux";
 import { myOrders } from "../slices/orderSlice";
 import { returnBook } from "../slices/rentSlice";
@@ -290,16 +291,19 @@ import { useEffect, useContext, useState } from "react";
 import { Rating, ThinStar } from "@smastrom/react-rating";
 import "@smastrom/react-rating/style.css";
 import AuthContext from "../context/authContext";
-import axios from "axios"; // Import axios for API calls
+import {Link} from 'react-router-dom'
+import { AiOutlineShoppingCart,AiOutlineUser } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 
 export default function MyOrders() {
-  const navigate=useNavigate()
+  const {handleLogout}=useContext(AuthContext)
+  const navigate = useNavigate();
   const { orderData } = useSelector((state) => state.orders);
   const [returnMsg, setReturnMsg] = useState({});
   const [reviewText, setReviewText] = useState({});
   const [rating, setRating] = useState({});
   const [photos, setPhotos] = useState({}); // State to store selected photos
+  const [submittedReviews, setSubmittedReviews] = useState({}); // State to store submitted reviews
   const { userState } = useContext(AuthContext);
   const dispatch = useDispatch();
 
@@ -321,64 +325,33 @@ export default function MyOrders() {
     }
   };
 
-  // const handleFileChange = (bookId, event) => {
-  //   const files = Array.from(event.target.files); // Convert FileList to an array
-  //   setPhotos((prevPhotos) => ({
-  //     ...prevPhotos,
-  //     [bookId]: files, // Store the selected files for the specific book
-  //   }));
-  // };
-
-  // const uploadPhotos = async (bookId, files) => {
-  //   const formData = new FormData();
-  //   files.forEach((file) => {
-  //     formData.append("photo", file); // Append each file to the FormData object
-  //   });
-
-  //   try {
-  //     const response = await axios.post(
-  //       `/api/review/book/${bookId}/photo`,
-  //       formData,
-  //       {
-  //         headers: {
-  //           "Content-Type": "multipart/form-data",
-  //           Authorization: localStorage.getItem("token"),
-  //         },
-  //       }
-  //     );
-  //     console.log("Uploaded Photos:", response.data);
-  //     return response.data.photos; // Return array of uploaded photo URLs
-  //   } catch (error) {
-  //     console.log("Error uploading photos:", error);
-  //     throw error;
-  //   }
-  // };
-
   const handleSubmit = async (bookId) => {
     if (!reviewText[bookId] || !rating[bookId]) {
       alert("Please provide both reviews and ratings");
       return;
     }
-
+  
     try {
-      // let uploadedPhotoUrls = [];
-
-      // // Check if photos exist and upload them first
-      // if (photos[bookId]?.length > 0) {
-      //   uploadedPhotoUrls = await uploadPhotos(bookId, photos[bookId]);
-      // }
-
       const reviewData = {
         reviewFor: "Book",
         reviewEntityId: bookId,
         reviewText: reviewText[bookId],
         rating: rating[bookId],
-        //photos: uploadedPhotoUrls, // Attach uploaded photo URLs
       };
-
-      dispatch(createReviews({ review: reviewData }));
+  
+      // Dispatch the createReviews action
+      const response = await dispatch(createReviews({ review: reviewData })).unwrap();
+  
+      console.log("Review submitted successfully:", response); // Log the response
+  
+      // Store the submitted review data in state
+      setSubmittedReviews((prevState) => ({
+        ...prevState,
+        [bookId]: response.review._id, // Ensure response contains the review data
+      }));
+  
       alert("Review submitted successfully");
-
+  
       // Reset form states
       setRating({ ...rating, [bookId]: "" });
       setReviewText({ ...reviewText, [bookId]: "" });
@@ -388,12 +361,47 @@ export default function MyOrders() {
       alert("Failed to submit review. Please try again.");
     }
   };
-  const handlePhotos=(id)=>{
-    navigate(`/review-photo/${id}`)
-  }
+
+  const handlePhotos = (bookId) => {
+    const reviewId = submittedReviews[bookId];
+    console.log('review id',bookId) // Get the review ID from the submitted reviews
+    if (reviewId) {
+      navigate(`/review-photo/${reviewId}`); // Navigate to the ReviewPhotos component with the review ID
+    } else {
+      alert("Please submit the review first before adding photos.");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
+
+<header className="w-full h-8 bg-red-700 text-white p-4 flex justify-between items-center px-6 left-0 top-0">
+        <h1 className="text-2xl font-bold">Bookmate</h1>
+        <div className="ml-auto flex gap-4">
+          <Link to="/profile" className="flex items-center gap-2 text-white hover:underline">
+            <AiOutlineUser size={24} /> Profile
+          </Link>
+          <Link to="/cart" className="flex items-center gap-2 text-white hover:underline">
+            <AiOutlineShoppingCart size={24} /> Cart
+          </Link>
+          <li>
+            <button
+              onClick={() => {
+                const confirm = window.confirm("Logged out?");
+                if (confirm) {
+                  handleLogout();
+                  localStorage.removeItem("token");
+                  navigate("/login");
+                }
+              }}
+              className="text-white hover:underline"
+            >
+              Logout
+            </button>
+          </li>
+        </div>
+      </header>
+
       <h3 className="text-2xl font-bold text-gray-800 text-center mb-4">
         My Orders - {orderData.length}
       </h3>
@@ -417,11 +425,11 @@ export default function MyOrders() {
                   {ele.book?.modifiedTitle}
                 </h2>
                 <p className="text-gray-600">
-                  Vendor: {ele.book?.vendor?.name}
+                  Vendor: {ele.vendor?.name}
                 </p>
                 <p className="text-gray-600">
                   Order placed on:{" "}
-                  {(ele.rent?.updatedAt || ele.buy?.updatedAt)?.split("T")[0]}
+                  {(ele.rent?.rentalStartDate || ele.buy?.updatedAt)?.split("T")[0]}
                 </p>
                 {orderType === "rent" && (
                   <p className="text-gray-600">
@@ -478,32 +486,23 @@ export default function MyOrders() {
                 />
               </div>
 
-              {/* File Upload Section
-              <div className="mt-3">
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={(e) => handleFileChange(ele.book?._id, e)}
-                  className="hidden"
-                  id={`file-input-${ele.book?._id}`}
-                />
-                <label
-                  htmlFor={`file-input-${ele.book?._id}`}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg cursor-pointer hover:bg-blue-600 transition duration-300"
-                >
-                  Add Photos
-                </label>
-              </div> */}
-
               <button
                 onClick={() => handleSubmit(ele.book?._id)}
+                // disabled={submittedReviews[ele.book?._id] || !reviewText[ele.book?._id]}
                 className="mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"
               >
                 Submit
               </button>
             </div>
-            <button onClick={()=>handlePhotos(ele._id)}> Add Photos</button>
+
+            {/* Add Photos Button */}
+            <button
+              onClick={() => handlePhotos(ele.book?._id)}
+              // disabled={!submittedReviews[ele.book?._id] || !reviewText[ele.book?._id]}
+              className="mt-3 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300"
+            >
+              Add Photos
+            </button>
           </div>
         );
       })}

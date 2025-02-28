@@ -1,10 +1,16 @@
-import { useEffect, useMemo } from "react";
+import { useContext, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchEarnings, uploadedBooks } from "../slices/bookSlice";
 import { Chart } from "react-google-charts";
+import {AiOutlineUpload,AiOutlineLogout,AiOutlineUser} from 'react-icons/ai'
+import {Link,useNavigate} from 'react-router-dom'
+import AuthContext from "../context/authContext";
+
 
 export default function Earnings() {
+  const {handleLogout}=useContext(AuthContext)
   const dispatch = useDispatch();
+  const navigate=useNavigate()
   const { bookData, earningsData } = useSelector((state) => state.books);
 
   useEffect(() => {
@@ -36,13 +42,42 @@ export default function Earnings() {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
+      <header className="w-full h-14 bg-red-700 text-white p-4 flex justify-between items-center px-6 left-0 top-0">
+              <div className="container mx-auto flex justify-between items-center">
+                <h1 className="text-2xl font-bold">Bookmate</h1>
+                <nav>
+                  <ul className="flex space-x-4 items-center">
+                    <li>
+                      <Link to="/profile">
+                        <AiOutlineUser size={24} /> Profile
+                      </Link>
+                    </li>
+                    <li>
+                      <button
+                        onClick={() => navigate("/upload")}
+                        className="text-white px-4 py-2 rounded-md hover:bg-red-500"
+                      >
+                        <AiOutlineUpload size={24}/>
+                        Upload Book
+                      </button>
+                    </li>
+                    <li>
+                      <button onClick={handleLogout} className="hover:underline">
+                        <AiOutlineLogout size={24} />
+                        Log Out
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            </header>
       <h2 className="text-2xl font-semibold text-gray-800 mb-4">My Earnings</h2>
       <h4 className="text-lg font-medium text-gray-700">Total Earnings: <span className="font-bold">{totalEarnings}</span></h4>
       <h4 className="text-lg font-medium text-gray-700 mb-4">Total Uploaded Books: <span className="font-bold">{bookData.length}</span></h4>
       
       <div className="overflow-x-auto">
         <table className="w-full bg-white shadow-md rounded-lg overflow-hidden">
-          <thead className="bg-gray-800 text-white">
+          <thead className="bg-grey-400 text-grey">
             <tr>
               <th className="py-3 px-4 text-left">Sl. No</th>
               <th className="py-3 px-4 text-left">Books</th>

@@ -6,6 +6,7 @@ import clientReducer from './slices/clientSlice'
 import reviewReducer from './slices/reviewSlice'
 import orderReducer from './slices/orderSlice'
 import buyReducer from './slices/buySlice'
+import paymentReducer from './slices/paymentSlice'
 const store=configureStore({
     reducer:{
         books:booksReducer,
@@ -14,7 +15,8 @@ const store=configureStore({
         clients:clientReducer,
         reviews:reviewReducer,
         orders:orderReducer,
-        buys:buyReducer
+        buys:buyReducer,
+        payments:paymentReducer
     }
 })
 export default store

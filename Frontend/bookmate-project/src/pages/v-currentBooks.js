@@ -1,9 +1,13 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { currentRentBooks, toDelivered } from '../slices/rentSlice';
 import { currentPurchasedBooks, SaleToDelivered } from '../slices/buySlice';
-
+import {AiOutlineUpload,AiOutlineLogout,AiOutlineUser} from 'react-icons/ai'
+import {Link,useNavigate} from 'react-router-dom'
+import AuthContext from '../context/authContext';
 export default function CurrentBooks() {
+    const {handleLogout}=useContext(AuthContext)
+    const navigate=useNavigate()
     const [initialRentData, setInitialRentData] = useState([]);
     const [initialSellData, setInitialSellData] = useState([]);
     const dispatch = useDispatch();
@@ -28,9 +32,12 @@ export default function CurrentBooks() {
 
     const handleDeliver = (id) => {
         const rent = initialRentData.find(ele => ele._id === id);
-        const confirm = window.confirm(`The ${rent.book.modifiedTitle} is delivered to ${rent.client.name}`);
+        const confirm = window.confirm(`The ${rent.book?.modifiedTitle} is delivered to ${rent.client?.name}`);
         if (confirm) {
-            dispatch(toDelivered(id));
+            dispatch(toDelivered(id)).then(() => {
+                // Remove the delivered item from the state
+                setInitialRentData(prevData => prevData.filter(ele => ele._id !== id));
+            });
         }
     };
 
@@ -38,7 +45,10 @@ export default function CurrentBooks() {
         const sale = initialSellData.find(ele => ele._id === id);
         const confirm = window.confirm(`The ${sale?.book?.modifiedTitle} is delivered to ${sale?.client?.name}`);
         if (confirm) {
-            dispatch(SaleToDelivered(id));
+            dispatch(SaleToDelivered(id)).then(() => {
+                // Remove the delivered item from the state
+                setInitialSellData(prevData => prevData.filter(ele => ele._id !== id));
+            });
         }
     };
 
@@ -49,6 +59,35 @@ export default function CurrentBooks() {
 
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
+             <header className="w-full h-14 bg-red-700 text-white p-4 flex justify-between items-center px-6 left-0 top-0">
+              <div className="container mx-auto flex justify-between items-center">
+                <h1 className="text-2xl font-bold">Bookmate</h1>
+                <nav>
+                  <ul className="flex space-x-4 items-center">
+                    <li>
+                      <Link to="/profile">
+                        <AiOutlineUser size={24} /> Profile
+                      </Link>
+                    </li>
+                    <li>
+                      <button
+                        onClick={() => navigate("/upload")}
+                        className="text-white px-4 py-2 rounded-md hover:bg-red-500"
+                      >
+                        <AiOutlineUpload size={24}/>
+                        Upload Book
+                      </button>
+                    </li>
+                    <li>
+                      <button onClick={handleLogout} className="hover:underline">
+                        <AiOutlineLogout size={24} />
+                        Log Out
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            </header>
             <h3 className="text-2xl font-bold mb-6 text-gray-800">Current Books</h3>
 
             {/* Rented Books Table */}

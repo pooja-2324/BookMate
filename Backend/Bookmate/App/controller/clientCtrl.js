@@ -56,7 +56,7 @@ clientCtrl.oneClient=async(req,res)=>{
 }
 clientCtrl.bookClientRentDetails=async(req,res)=>{
     try{
-        const clients=await Client.find().populate('rentedBooks.book rentedBooks.rent')
+        const clients=await Client.find().populate('rentedBooks.book rentedBooks.rent rentedBooks.rent.client')
         if(!clients){
             return res.status(404).json({error:'clients not found'})
         }

@@ -1,19 +1,21 @@
 import { format } from "date-fns";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { activeRent } from "../slices/rentSlice";
-import { AiOutlineCheckSquare } from "react-icons/ai";
+import { AiOutlineCheckSquare, AiOutlineUpload, AiOutlineLogout, AiOutlineUser } from "react-icons/ai";
+import { Link, useNavigate } from "react-router-dom";
+import AuthContext from "../context/authContext";
 
 export default function DueDateCalendar() {
+    const { handleLogout } = useContext(AuthContext);
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const { rentData } = useSelector((state) => state.rents);
     const [dueDates, setDueDates] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [book, setBook] = useState(null);
-    const [hoveredClientId, setHoveredClientId] = useState(null);
-    const [selectedDateDetails, setSelectedDateDetails] = useState([]); // State to store selected date details
+    const [selectedDateDetails, setSelectedDateDetails] = useState([]);
 
     useEffect(() => {
         dispatch(activeRent()).then(() => setLoading(false));
@@ -24,8 +26,7 @@ export default function DueDateCalendar() {
             setDueDates(
                 rentData?.map((ele) => ({
                     date: format(new Date(ele.dueDate), "yyyy-MM-dd"),
-                    clientId: ele.client.client,
-                    clientName: ele.client?.name, // Add client name
+                    clientName: ele.client?.name,
                     book: ele.book?.modifiedTitle,
                     rentalStartDate: ele.rentalStartDate,
                     dueDate: ele.dueDate,
@@ -35,109 +36,84 @@ export default function DueDateCalendar() {
         }
     }, [rentData]);
 
-    // Handle date click
     const handleDateClick = (date) => {
         const formattedDate = format(new Date(date), "yyyy-MM-dd");
         const details = rentData.filter(
             (ele) => format(new Date(ele.dueDate), "yyyy-MM-dd") === formattedDate
         );
-        setSelectedDateDetails(details); // Set the details for the selected date
+        setSelectedDateDetails(details);
     };
 
     return (
-        <div className="flex flex-col items-center bg-white p-6 shadow-lg rounded-lg">
-            <h2 className="text-xl font-semibold text-gray-700 mb-4">Due Date Calendar</h2>
-            {loading ? (
-                <p className="text-gray-500">Loading due dates...</p>
-            ) : (
-                <div className="relative">
-                    <Calendar
-                        className="border border-gray-300 rounded-lg p-4"
-                        tileClassName={({ date }) => {
-                            if (!date || isNaN(date.getTime())) return "";
-                            const formattedDate = format(new Date(date), "yyyy-MM-dd");
-                            return dueDates.some((ele) => ele.date === formattedDate)
-                                ? "bg-red-200 rounded-full"
-                                : "";
-                        }}
-                        tileContent={({ date }) => {
-                            if (!date || isNaN(date.getTime())) return null;
-                            const formattedDate = format(new Date(date), "yyyy-MM-dd");
-                            const matchEntry = dueDates.find((ele) => ele.date === formattedDate);
-                            return matchEntry ? (
-                                <span
-                                    className="text-red-600 cursor-pointer"
-                                    onMouseEnter={() => {
-                                        setHoveredClientId(matchEntry.clientId);
-                                        setBook(matchEntry.book);
-                                    }}
-                                    onMouseLeave={() => setHoveredClientId(null)}
-                                >
-                                    <AiOutlineCheckSquare size={18}/>
-                                </span>
-                            ) : null;
-                        }}
-                        onClickDay={handleDateClick} // Add click handler for dates
-                    />
-                    {hoveredClientId && (
-                        <div className="absolute top-12 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-sm p-2 rounded shadow-md">
-                            <p>Client ID: {hoveredClientId}</p>
-                            <p>Book: {book}</p>
-                        </div>
+        <div className="flex flex-col items-center bg-white p-6 shadow-lg rounded-lg w-full">
+            <header className="w-full h-14 bg-red-700 text-white p-4 flex justify-between items-center px-6">
+                <h1 className="text-2xl font-bold">Bookmate</h1>
+                <nav>
+                    <ul className="flex space-x-4 items-center">
+                        <li><Link to="/profile"><AiOutlineUser size={24} /> Profile</Link></li>
+                        <li><button onClick={() => navigate("/upload")} className="text-white px-4 py-2 rounded-md hover:bg-red-500"><AiOutlineUpload size={24}/> Upload Book</button></li>
+                        <li><button onClick={handleLogout} className="hover:underline"><AiOutlineLogout size={24} /> Log Out</button></li>
+                    </ul>
+                </nav>
+            </header>
+            {/* <button
+                onClick={()=>navigate(-1)}
+                className="mb-4 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+            >
+                Back
+            </button> */}
+            <div className="flex flex-row w-full mt-6 space-x-6">
+                {/* Calendar Section */}
+                <div className="flex flex-col items-center w-1/2 p-6 bg-gray-100 rounded-lg shadow-md">
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4">Due Date Calendar</h2>
+                    {loading ? (
+                        <p className="text-gray-500">Loading due dates...</p>
+                    ) : (
+                        <Calendar
+                            className="border border-gray-300 rounded-lg p-4 shadow-md w-full"
+                            tileClassName={({ date }) => {
+                                if (!date || isNaN(date.getTime())) return "";
+                                const formattedDate = format(new Date(date), "yyyy-MM-dd");
+                                return dueDates.some((ele) => ele.date === formattedDate)
+                                    ? "bg-red-500 text-red rounded-full"
+                                    : "";
+                            }}
+                            onClickDay={handleDateClick}
+                        />
                     )}
                 </div>
-            )}
 
-            {/* Display selected date details */}
-            {selectedDateDetails.length > 0 && (
-                <div className="mt-6 w-full">
-                    <h3 className="text-lg font-semibold text-gray-700 mb-4">
-                        Rent Details for Selected Date
-                    </h3>
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Book
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Client Name
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Rent Start Date
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Due Date
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Duration (Days)
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {selectedDateDetails.map((ele, index) => (
-                                <tr key={index} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {ele.book?.modifiedTitle}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {ele.client?.name}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {format(new Date(ele.rentalStartDate), "yyyy-MM-dd")}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {format(new Date(ele.dueDate), "yyyy-MM-dd")}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {ele.period}
-                                    </td>
+                {/* Rent Details Section */}
+                <div className="w-1/2 p-6 bg-white rounded-lg shadow-md">
+                    <h3 className="text-lg font-semibold text-gray-700 mb-4">Rent Details</h3>
+                    {selectedDateDetails.length > 0 ? (
+                        <table className="w-full border-collapse border border-gray-300">
+                            <thead>
+                                <tr className="bg-gray-50">
+                                    <th className="border p-2 text-left">Book</th>
+                                    <th className="border p-2 text-left">Client</th>
+                                    <th className="border p-2 text-left">Start Date</th>
+                                    <th className="border p-2 text-left">Due Date</th>
+                                    <th className="border p-2 text-left">Days</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {selectedDateDetails.map((ele, index) => (
+                                    <tr key={index} className="hover:bg-gray-100 transition-all">
+                                        <td className="border p-2">{ele.book?.modifiedTitle}</td>
+                                        <td className="border p-2">{ele.client?.name}</td>
+                                        <td className="border p-2">{format(new Date(ele.rentalStartDate), "yyyy-MM-dd")}</td>
+                                        <td className="border p-2">{format(new Date(ele.dueDate), "yyyy-MM-dd")}</td>
+                                        <td className="border p-2">{ele.period}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    ) : (
+                        <p className="text-gray-500">Select a date to view details</p>
+                    )}
                 </div>
-            )}
+            </div>
         </div>
     );
 }

@@ -28,7 +28,7 @@ bookCtrl.create=async(req,res)=>{
         body.pages=result.pageCount
         body.status='available'
         body.publishedYear=result.publishedDate
-        body.coverImage=result.imageLinks.thumbnail
+        body.coverImage=result?.imageLinks?.thumbnail
         body.genre=result.categories
         body.description=result.description
         // const response=await axios.get(`https://openlibrary.org/search.json?title=${body.title}`)

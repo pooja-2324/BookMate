@@ -7,6 +7,7 @@ export const createReviews=createAsyncThunk('reviews/createReviews',async({revie
         const response=await axios.post('/api/review/create',review,{
             headers:{Authorization:localStorage.getItem('token')}
         })
+        console.log('create review',response.data)
         return response.data
     }catch(err){
         console.log(err)
@@ -42,7 +43,7 @@ export const reviewPhoto=createAsyncThunk('reviews/reviewPhoto',async({rid,formD
         })
         return response.data
     }catch(err){
-        console.log(err)
+        console.log(err.response?.data?.error)
         return rejectWithValue(err.response.data.error)
     }
 })

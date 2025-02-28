@@ -1,7 +1,13 @@
 import Vendor from "../models/vendor-model.js";
 import User from "../models/user-model.js";
-
+import Stripe from 'stripe'
+import Rent from "../models/rental-model.js";
+import Payment from "../models/payment-model.js";
+import Client from "../models/client-model.js"
+import Book from '../models/book-model.js'
 const vendorCtrl={}
+
+const stripe=new Stripe(process.env.STRIPE_SECRET_KEY)
 
 vendorCtrl.allVendors=async(req,res)=>{
     try{
@@ -179,6 +185,258 @@ vendorCtrl.oneVendor=async(req,res)=>{
     }
   };
   
+  // vendorCtrl.acceptReturn = async (req, res) => {
+  //   try {
+  //     const { rid } = req.body;
+  //     const rent = await Rent.findById(rid).populate('book').populate('client').populate('vendor');
+      
+  //     if (!rent) {
+  //       return res.status(400).json({ error: 'Rent not found' });
+  //     }
   
+  //     const cautionDeposit = rent.pricing.cautionDeposit;
+  //     const readingFee = rent.pricing.readingFee;
+  //     const platformFee = rent.pricing.platformFee;
+  //     const deliveryFee = rent.pricing.deliveryFee;
+  //     const returnDate = new Date();
+  //     const lateFee = rent.dueDate < returnDate ? (returnDate - rent.dueDate) / (1000 * 60 * 60 * 24) * 10 : 0; // Calculate late fee for each day over due date
+  
+  //     const totalClientRefund = cautionDeposit - rent.damageFee;
+  //     const totalVendorEarnings = rent.damageFee + lateFee * 0.5;
+  
+  //     // Update client's balance
+  //     await Client.findByIdAndUpdate(rent.client._id, {
+  //       $inc: { refund: totalClientRefund }
+        
+  //     });
+  
+  //     // Update vendor's balance
+  //     const vendor = await Vendor.findOne({ vendor: rent.vendor._id });
+  
+  //     if (vendor) {
+  //       const existingEarningsIndex = vendor.totalEarnings?.findIndex(
+  //         (entry) => entry.book.toString() === rent.book._id.toString()
+  //       );
+  
+  //       if (existingEarningsIndex > -1) {
+  //         await Vendor.findOneAndUpdate(
+  //           { _id: vendor._id, "totalEarnings.book": rent.book._id },
+  //           { $inc: { "totalEarnings.$.earnings": totalVendorEarnings } }
+  //         );
+  //       } else {
+  //         await Vendor.findByIdAndUpdate(
+  //           vendor._id,
+  //           {
+  //             $push: {
+  //               totalEarnings: {
+  //                 book: rent.book._id,
+  //                 earnings: totalVendorEarnings
+  //               }
+  //             }
+  //           }
+  //         );
+  //       }
+  //     }
+  
+  //     // Update book status
+  //     await Book.findByIdAndUpdate(rent.book._id, {
+  //       status: "available"
+  //     }, { new: true });
+  
+  //     // Update rent status
+  //     await Rent.findByIdAndUpdate(rid, {
+  //       rentedBookStatus: "completed",
+  //       returnedDate: new Date()
+  //     }, { new: true });
+  
+  //     // Create a payment record for the transaction
+  //     const vendorPayment = new Payment({
+  //       rentId: rid,
+  //       clientId: rent.client._id,
+  //       vendorId: rent.vendor._id,
+  //       amount: totalVendorEarnings,
+  //       paymentReason: 'returnAccept',
+  //       paymentStatus: 'success'
+  //     });
+  
+  //     await vendorPayment.save();
+  
+  //     const clientPayment = new Payment({
+  //       rentId: rid,
+  //       clientId: rent.client._id,
+  //       vendorId: rent.vendor._id,
+  //       amount: totalClientRefund,
+  //       paymentReason: 'refund',
+  //       paymentStatus: 'success',
+  //       paymentType: 'debit' // Indicates this is a refund to the client
+  //     });
+  
+  //     await clientPayment.save();
+  
+  //     res.json({ message: "Return accepted successfully", vendorPayment, clientPayment });
+  //   } catch (err) {
+  //     console.error(err);
+  //     res.status(500).json({ error: 'Something went wrong' });
+  //   }
+  // };
+   // Replace with your Stripe secret key
 
+   vendorCtrl.acceptReturn = async (req, res) => {
+    try {
+      const { rid } = req.body;
+      const rent = await Rent.findById(rid)
+        .populate('book')
+        .populate('client')
+        .populate('vendor');
+  
+      if (!rent) {
+        return res.status(400).json({ error: 'Rent not found' });
+      }
+  
+      const cautionDeposit = rent.pricing.cautionDeposit;
+      const readingFee = rent.pricing.readingFee;
+      const platformFee = rent.pricing.platformFee;
+      const deliveryFee = rent.pricing.deliveryFee;
+      const returnDate = new Date();
+      const lateFee =
+        rent.dueDate < returnDate
+          ? ((returnDate - rent.dueDate) / (1000 * 60 * 60 * 24)) * 10
+          : 0; // Calculate late fee for each day over due date
+  
+      const totalClientRefund = cautionDeposit - rent.damageFee;
+      const totalVendorEarnings = rent.pricing.readingFee+rent.damageFee + (lateFee * 0.5);
+      console.log('crefund',totalClientRefund,'vearnings',totalVendorEarnings)
+      const client = await Client.findOne({ client: rent.client._id });
+      console.log('rent',rent)
+      if (!client || !client.paymentIntent) {
+        return res.status(400).json({ error: 'Client or payment intent ID is missing' });
+      }
+  
+      if (totalClientRefund <= 0) {
+        return res.status(400).json({ error: 'Invalid refund amount' });
+      }
+  
+      // Validate amounts before Stripe API calls
+      const refundAmountInCents = Math.round(totalClientRefund * 100);
+      const vendorEarningsInCents = Math.round(totalVendorEarnings * 100);
+
+      console.log('refund',refundAmountInCents,'earnings',vendorEarningsInCents)
+  
+      if (refundAmountInCents < 1 || vendorEarningsInCents < 1) {
+        return res.status(400).json({ error: 'Amount must be at least 0.01 USD' });
+      }
+  
+      // Update client's balance
+      await Client.findByIdAndUpdate(rent.client._id, {
+        $inc: { refund: totalClientRefund },
+      });
+  
+      // Update vendor's balance
+      const vendor = await Vendor.findOne({ vendor: rent.vendor._id });
+  
+      if (vendor) {
+        const existingEarningsIndex = vendor.totalEarnings?.findIndex(
+          (entry) => entry.book.toString() === rent.book._id.toString()
+        );
+  
+        if (existingEarningsIndex > -1) {
+          await Vendor.findOneAndUpdate(
+            { _id: vendor._id, 'totalEarnings.book': rent.book._id },
+            { $inc: { 'totalEarnings.$.earnings': totalVendorEarnings } }
+          );
+        } else {
+          await Vendor.findByIdAndUpdate(vendor._id, {
+            $push: {
+              totalEarnings: {
+                book: rent.book._id,
+                earnings: totalVendorEarnings,
+              },
+            },
+          });
+        }
+      }
+  
+      // Update book status
+      await Book.findByIdAndUpdate(
+        rent.book._id,
+        {
+          status: 'available',
+        },
+        { new: true }
+      );
+  
+      // Update rent status
+      await Rent.findByIdAndUpdate(
+        rid,
+        {
+          rentedBookStatus: 'completed',
+          returnedDate: new Date(),
+        },
+        { new: true }
+      );
+  
+      // Refund to Client
+      // const refund = await stripe.refunds.create({
+      //   payment_intent: client.paymentIntent, // Use the payment intent ID from the initial payment
+      //   amount: refundAmountInCents, // Amount in cents
+      //   metadata: {
+      //     reason: 'Refund for caution deposit', // Add metadata for additional information
+      //   },
+      // });
+      const refund=await stripe.transfers.create({
+        amount:refundAmountInCents,
+        currency:'usd',
+        destination:process.env.STRIPE_CLIENT_KEY,
+        description:'refund for cautionDeposit'
+      })
+      const paymentIntent = await stripe.paymentIntents.retrieve(client.paymentIntent);
+console.log('Original Amount:', paymentIntent.amount);
+console.log('Refunded Amount:', paymentIntent.amount_refunded);
+console.log('Unrefunded Amount:', paymentIntent.amount - paymentIntent.amount_refunded);
+      // Transfer to Vendor's Connected Account
+      const vendorTransfer = await stripe.transfers.create({
+        amount: vendorEarningsInCents, // Amount in cents
+        currency: 'usd', // Replace with your currency
+        destination: process.env.STRIPE_VENDOR_KEY, // Vendor's connected account ID
+        description: `Earnings from book rental (Rent ID: ${rid})`,
+      });
+  
+      // Create a payment record for the transaction
+      const vendorPayment = new Payment({
+        rentId: rid,
+        clientId: rent.client._id,
+        vendorId: rent.vendor._id,
+        amount: totalVendorEarnings,
+        paymentReason: 'returnAccept',
+        paymentStatus: 'success',
+        stripeTransferId: vendorTransfer.id, // Save Stripe transfer ID for reference
+      });
+  
+      await vendorPayment.save();
+  
+      const clientPayment = new Payment({
+        rentId: rid,
+        clientId: rent.client._id,
+        vendorId: rent.vendor._id,
+        amount: totalClientRefund,
+        paymentReason: 'refund',
+        paymentStatus: 'success',
+        paymentType: 'debit', // Indicates this is a refund to the client
+        stripeRefundId: refund.id, // Save Stripe refund ID for reference
+      });
+  
+      await clientPayment.save();
+  
+      res.json({
+        message: 'Return accepted successfully',
+        vendorPayment,
+        clientPayment,
+        vendorTransfer,
+        refund,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Something went wrong in accept return book' });
+    }
+  };
 export default vendorCtrl
