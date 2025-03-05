@@ -19,10 +19,12 @@ export default function ReturnAccept() {
     const confirm = window.confirm("Are you sure you want to accept this return?");
     if (confirm) {
       try {
+        console.log("confirmed, dispatching...")
         // Send isDamaged status to the backend
         await dispatch(acceptReturn({rid}));
         alert("Return accepted successfully");
         // Refresh the list of pending returns
+        console.log("dispatch pending rents");
         dispatch(pendingRents());
       } catch (error) {
         console.error("Error accepting return:", error);

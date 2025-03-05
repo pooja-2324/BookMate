@@ -33,6 +33,10 @@ const clientSchema=new Schema({
         type:Schema.Types.ObjectId,
         ref:"Review"
     }],
+    isApproved:{
+        type:Boolean,
+        default:true
+    },
     paymentIntent:String,
 
 

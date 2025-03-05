@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Upload() {
-  const { serverError, editId, bookData } = useSelector((state) => state.books);
+  const { serverError, editId, uploaded } = useSelector((state) => state.books);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -38,10 +38,10 @@ export default function Upload() {
 
   useEffect(() => {
     if (editId) {
-      const book = bookData.find((ele) => ele._id === editId);
+      const book = uploaded.find((ele) => ele._id === editId);
       setForm({ ...book });
     }
-  }, [editId, bookData]);
+  }, [editId, uploaded]);
 const resetForm=()=>{
     setForm(formInitialValue)
 }

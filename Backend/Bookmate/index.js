@@ -214,7 +214,7 @@ app.post('/api/user/verifyOtp', userCtrl.verifyOtp);
 app.get('/api/user/account', AuthenticateUser, userCtrl.account);
 app.post('/api/user/profilePic', AuthenticateUser, upload.single('profilePic'), userCtrl.updateProfilePic);
 app.put('/api/user/update',AuthenticateUser,userCtrl.update)
-
+app.get('/api/user/all',AuthenticateUser,AuthorizeUser(['admin']),userCtrl.all)
 // Google OAuth Routes
 app.get('/auth/google', (req, res, next) => {
     req.session.role = req.query.role || "client"; // Store role in session
@@ -229,14 +229,26 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
 app.get('/api/client/allClients', clientCtrl.allClients);
 app.get('/api/client/book/rentDetails', AuthenticateUser, AuthorizeUser(['vendor']), clientCtrl.bookClientRentDetails);
 app.get('/api/book/clientCounts', AuthenticateUser, AuthorizeUser(['vendor']), clientCtrl.getClientsUsingBooks);
+app.get('/api/client/verified',AuthenticateUser,AuthorizeUser(['admin']),clientCtrl.verified)
+app.get('/api/client/blocked',AuthenticateUser,AuthorizeUser(['admin']),clientCtrl.blocked)
 app.get('/api/client/:id', AuthenticateUser, clientCtrl.oneClient);
+app.put('/api/client/:cid/update',AuthenticateUser,AuthorizeUser(['admin']),clientCtrl.updateVerification)
 
 app.get('/api/vendor/allVendors', AuthenticateUser, AuthorizeUser(['admin']), vendorCtrl.allVendors);
 app.get('/api/vendor/earnings', AuthenticateUser, AuthorizeUser(['vendor']), vendorCtrl.earnings);
-app.post('/api/vendor/acceptReturn',AuthenticateUser,vendorCtrl.acceptReturn)
+
+app.get('/api/vendor/verified',AuthenticateUser,AuthorizeUser(['admin']),vendorCtrl.verified)
+app.get('/api/vendor/blocked',AuthenticateUser,AuthorizeUser(['admin']),vendorCtrl.blocked)
 app.get('/api/vendor/:id', AuthenticateUser, AuthorizeUser(['admin']), vendorCtrl.oneVendor);
+app.post('/api/vendor/acceptReturn',AuthenticateUser,vendorCtrl.acceptReturn)
+app.put('/api/vendor/:vid/update',AuthenticateUser,AuthorizeUser(['admin']),vendorCtrl.updateVerification)
+
 
 app.post('/api/book/create', AuthenticateUser, AuthorizeUser(['vendor']), checkSchema(bookCreateSchema), checkSchema(AccountStatus), bookCtrl.create);
+app.get('/api/book/count',AuthenticateUser,AuthorizeUser(['admin']),bookCtrl.count)
+//app.get('/api/book/verified',AuthenticateUser,AuthorizeUser(['admin']),bookCtrl.verified)
+app.get('/api/book/blocked',AuthenticateUser,AuthorizeUser(['admin']),bookCtrl.blocked)
+
 app.get('/api/book/myBook', AuthenticateUser, AuthorizeUser(['vendor', 'admin']), bookCtrl.myBooks);
 app.get('/api/book/allBooks', AuthenticateUser, AuthorizeUser(['admin']), bookCtrl.allBooks);
 app.get('/api/book/verified', bookCtrl.verified);

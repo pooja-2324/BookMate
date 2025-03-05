@@ -8,10 +8,12 @@ import upload from "../middleware/multer.js"
 import fs from 'fs'
 import cloudinary from '../../config/cloudinary-profile.js'
 dotenv.config()
+import Stripe from 'stripe'
 import { validationResult } from 'express-validator';
 import User from "../models/user-model.js";
- const userCtrl={}
 
+ const userCtrl={}
+ const stripe=new Stripe(process.env.STRIPE_SECRET_KEY)
 userCtrl.count=async(req,res)=>{
     try{
         const count=await User.countDocuments()
@@ -22,53 +24,140 @@ userCtrl.count=async(req,res)=>{
     }
 }
 
- userCtrl.register=async(req,res)=>{
-    const errors=validationResult(req)
-    if(!errors.isEmpty()){
-       return  res.status(400).json({errors:errors.array()})
-    }
-    try{
-        const body=req.body
-        const user=new User(body)
-        const salt=await bcryptjs.genSalt()
-        const hash=await bcryptjs.hash(body.password,salt)
+//  userCtrl.register=async(req,res)=>{
+//     const errors=validationResult(req)
+//     if(!errors.isEmpty()){
+//        return  res.status(400).json({errors:errors.array()})
+//     }
+//     try{
+//         const body=req.body
+//         const user=new User(body)
+//         const salt=await bcryptjs.genSalt()
+//         const hash=await bcryptjs.hash(body.password,salt)
         
-        user.password=hash
-        const count= await User.countDocuments()
+//         user.password=hash
+//         const count= await User.countDocuments()
         
-        if(count==0){
-            user.role='admin'
-        }
-        await user.save()
-        if (body.role === 'client') {
-            const client=new Client({
-                client: user._id,
-                wallet: 0, 
-                rentedBooks: [],
-                purchasedBooks: [],
-                reviews:[]
-            });
-            await client.save();
-        }
-        else if (body.role === 'vendor') {
-            const vendor=new Vendor({
-                vendor: user._id,
-                uploadedBooks: [],
-                totalEarnings: [],
-                reviews:[]
-            });
-            await vendor.save();
-        }
-        res.status(201).json(user)
+//         if(count==0){
+//             user.role='admin'
+//         }
+//         await user.save()
+//         if (body.role === 'client') {
+//             const client=new Client({
+//                 client: user._id,
+//                 wallet: 0, 
+//                 rentedBooks: [],
+//                 purchasedBooks: [],
+//                 reviews:[]
+//             });
+//             await client.save();
+//         }
+//         else if (body.role === 'vendor') {
+//             const vendor=new Vendor({
+//                 vendor: user._id,
+//                 uploadedBooks: [],
+//                 totalEarnings: [],
+//                 reviews:[]
+//             });
+//             const vendorAccount = await stripe.accounts.create({
+//                 type: 'express', // or 'standard' depending on your use case
+//                 country: 'US', // Replace with the vendor's country
+//                 email: user.email, // Replace with the vendor's email
+//                 capabilities: {
+//                   card_payments: { requested: true },
+//                   transfers: { requested: true },
+//                 },
+//               });
+//             await vendor.save();
+//         }
+//         res.status(201).json(user)
 
 
-    }catch(err){
-        console.log('error',err)
-        res.status(500).json({error:'something went wrong'})
+//     }catch(err){
+//         console.log('error',err)
+//         res.status(500).json({error:'something went wrong'})
 
+//     }
+//  }
+userCtrl.register = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
- }
-
+  
+    try {
+      const body = req.body;
+  
+      // Validate the role
+      if (body.role !== 'client' && body.role !== 'vendor') {
+        return res.status(400).json({ error: 'Invalid role. Role must be "client" or "vendor".' });
+      }
+  
+      // Hash the password
+      const salt = await bcryptjs.genSalt();
+      const hash = await bcryptjs.hash(body.password, salt);
+  
+      // Create the user
+      const user = new User({
+        ...body,
+        password: hash,
+      });
+  
+      // Set the role to 'admin' if it's the first user
+      const count = await User.countDocuments();
+      if (count === 0) {
+        user.role = 'admin';
+      }
+  
+      // Save the user
+      await user.save();
+  
+      // Create a client or vendor based on the role
+      if (body.role === 'client') {
+        const client = new Client({
+          client: user._id,
+          wallet: 0,
+          rentedBooks: [],
+          purchasedBooks: [],
+          reviews: [],
+        });
+        await client.save();
+      } else if (body.role === 'vendor') {
+        // Create a Stripe connected account for the vendor
+        let vendorAccount;
+        try {
+          vendorAccount = await stripe.accounts.create({
+            type: 'express', // or 'standard' depending on your use case
+            country: 'US', // Replace with the vendor's country
+            email: user.email, // Use the user's email
+            capabilities: {
+              card_payments: { requested: true },
+              transfers: { requested: true },
+            },
+          });
+        } catch (stripeErr) {
+          console.error('Error creating Stripe connected account:', stripeErr);
+          return res.status(500).json({ error: 'Failed to create Stripe account for vendor' });
+        }
+  
+        // Create the vendor and save the Stripe account ID
+        const vendor = new Vendor({
+          vendor: user._id,
+          uploadedBooks: [],
+          totalEarnings: [],
+          reviews: [],
+          stripeAccountId: vendorAccount.id, // Save the Stripe account ID
+        });
+        await vendor.save();
+      }
+  
+      // Return the created user
+      res.status(201).json(user);
+    } catch (err) {
+      console.error('Error:', err);
+      res.status(500).json({ error: 'Something went wrong' });
+    }
+  };
  userCtrl.login=async(req,res)=>{
     try{
         const body=req.body
@@ -285,4 +374,13 @@ userCtrl.updateProfilePic = async (req, res) => {
     //         res.status(500).json({ error: "Something went wrong" });
     //     }
     // };
+    userCtrl.all=async(req,res)=>{
+        try{
+            const users=await User.find()
+            res.json(users)
+        }catch(err){
+            console.log(err)
+            res.status(500).json({error:'something went wrong'})
+        }
+    }
  export default userCtrl

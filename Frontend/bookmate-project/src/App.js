@@ -30,7 +30,10 @@ import ReviewPhotos from './pages/review-photo';
 import PaymentFailed from './pages/payment-failed'
 import PaymentSuccess from './pages/payment-success'
 import ReturnAccept from './pages/v-returnAccept';
-
+import AdminDashBoard from './pages/a-dashboard';
+import Vendors from './pages/a-vendors';
+import AdminBooks from './pages/a-books'
+import Clients from './pages/a-clients';
 
 import Payment from './pages/payment';
 
@@ -48,7 +51,8 @@ function App() {
      
       {/* <Home searchTerm={searchTerm} /> */}
       <ul className='links'>
-      {userState?.user?.role=='client'?<>
+      {userState?.user?.role=='admin'?<>
+        
      </>:<></>}
       {}
       
@@ -92,6 +96,11 @@ function App() {
         <Route path='/payment/success'element={<PrivateRoute><PaymentSuccess/></PrivateRoute>}/>
         <Route path="/payment/failed" element={<PrivateRoute><PaymentFailed/></PrivateRoute>}/>
         <Route path='/accept' element={<PrivateRoute><ReturnAccept/></PrivateRoute>}/>
+        <Route path='/admin-dashboard' element={<PrivateRoute permittedRole={['admin']}><AdminDashBoard/></PrivateRoute>}/>
+        <Route path='/admin-users' element={<PrivateRoute permittedRole={['admin']}><Vendors/></PrivateRoute>}/>
+        <Route path='/admin-books' element={<PrivateRoute permitterRole={['admin']}><AdminBooks/></PrivateRoute>}/>
+        <Route path='/admin-clients' element={<PrivateRoute permittedRole={['admin']}><Clients/></PrivateRoute>}/>
+
         
       </Routes>
       <ToastContainer />

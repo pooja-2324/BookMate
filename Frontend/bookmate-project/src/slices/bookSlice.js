@@ -26,6 +26,7 @@ export const upload = createAsyncThunk('books/upload', async ({ form, resetForm 
 });
 export const deleteBook=createAsyncThunk('books/deleteBook',async(id,{rejectWithValue})=>{
     try{
+        console.log('delete id',id)
         const response=await axios.delete(`/api/book/${id}/delete`,{
             headers:{Authorization:localStorage.getItem('token')}
         })
@@ -82,9 +83,7 @@ export const fetchEarnings=createAsyncThunk('books/fetchEarnings',async(_,{rejec
 })
 export const verifiedBooks=createAsyncThunk('books/verifiedBooks',async(_,{rejectWithValue})=>{
     try{
-        const response=await axios.get('/api/book/verified',{
-            headers:{Authorization:localStorage.getItem('token')}
-        })
+        const response=await axios.get('/api/book/verified')
         console.log('verified',response.data)
         return response.data
     }catch(err){
@@ -93,10 +92,35 @@ export const verifiedBooks=createAsyncThunk('books/verifiedBooks',async(_,{rejec
         
     }
 })
+export const blockedBooks=createAsyncThunk('books/blockedBooks',async(_,{rejectWithValue})=>{
+    try{
+        const response=await axios.get('/api/book/blocked',{
+            headers:{Authorization:localStorage.getItem('token')}
+        })
+        return response.data
+    }catch(err){
+        console.log(err)
+        return rejectWithValue(err.response.data.error)
+    }
+})
+export const verify=createAsyncThunk('books/verify',async({bid,isVerified},{rejectWithValue})=>{
+    try{
+        const response=await axios.put(`/api/book/${bid}/verify`,{isVerified},{
+            headers:{Authorization:localStorage.getItem('token')}
+        })
+        return response.data
+    }catch(err){
+        console.log(err)
+        return rejectWithValue(err.response.data.error)
+    }
+})
 const bookSlice=createSlice({
     name:"books",
     initialState:{
         bookData:[],
+        verified:[],
+        blocked:[],
+        uploaded:[],
         clientCount:{},
         earningsData:null,
         serverError:null,
@@ -116,7 +140,7 @@ const bookSlice=createSlice({
         })
     
         builder.addCase(upload.fulfilled,(state,action)=>{
-            state.bookData=(action.payload)
+            state.uploaded=(action.payload)
             state.serverError=null
         })
     
@@ -149,12 +173,33 @@ const bookSlice=createSlice({
         })
         builder.addCase(verifiedBooks.fulfilled,(state,action)=>{
             state.bookData=action.payload
-
         })
         builder.addCase(verifiedBooks.rejected,(state,action)=>{
             state.serverError=action.payload
         })
+        builder.addCase(blockedBooks.fulfilled,(state,action)=>{
+            state.blocked=action.payload
+        })
+        builder.addCase(blockedBooks.rejected,(state,action)=>{
+            state.serverError=action.payload
+        })
+        builder.addCase(verify.fulfilled, (state, action) => {
+            const updatedBook = action.payload;
+            
+            // Update in verified list
+            state.verified = state.verified.map(book =>
+                book._id === updatedBook._id ? updatedBook : book
+            );
         
+            // Update in blocked list
+            state.blocked = state.blocked.map(book =>
+                book._id === updatedBook._id ? updatedBook : book
+            );
+        });
+        
+        builder.addCase(verify.rejected,(state,action)=>{
+            state.serverError=action.payload
+        })
     }
 })
 export const {assignEditId} =bookSlice.actions

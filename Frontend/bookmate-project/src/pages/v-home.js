@@ -119,7 +119,7 @@ export default function MyBooks() {
     dispatch(uploadedBooks());
     dispatch(fetchClientCount());
   }, [dispatch]);
-
+  console.log('bookData',bookData)
   const handleLogout = () => {
     if (window.confirm("Are you sure you want to log out?")) {
       localStorage.removeItem("token");
@@ -139,9 +139,9 @@ export default function MyBooks() {
       });
     }
   };
-
+  console.log('bookData',bookData)
   // Apply filters and search
-  let filteredBooks = (bookData || []).filter((ele) => {
+  let filteredBooks = bookData?.filter((ele) => {
     const matchesSearch =
       ele.modifiedTitle?.toLowerCase().includes(searchTerm?.toLowerCase() ?? "") ||
       ele.author?.toLowerCase().includes(searchTerm?.toLowerCase() ?? "") ||

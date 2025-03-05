@@ -12,7 +12,7 @@ export const AuthenticateUser=async(req,res,next)=>{
         
     }catch(err){
         console.log(err)
-        return res.status(500).json({error:'something went wrong'})
+        return res.status(500).json({error:'something went wrong in authentication'})
 
     }
 }

@@ -16,6 +16,44 @@ clientCtrl.allClients=async(req,res)=>{
         res.status(500).json({error:'something went wrong'})
     }
 }
+clientCtrl.verified=async(req,res)=>{
+    try{
+        const clients=await Client.find({isApproved:true}).populate('client')
+        if(!clients){
+            return res.status(400).json({error:'clients not found'})
+        }
+        res.json(clients)
+    }catch(err){
+        console.log(err)
+        res.status(500).json({error:'something went wrong in verified clients'})
+    }
+}
+clientCtrl.blocked=async(req,res)=>{
+    try{
+        const clients=await Client.find({isApproved:false}).populate('client')
+        if(!clients){
+            return res.status(400).json({error:'clients not found'})
+        }
+        res.json(clients)
+    }catch(err){
+        console.log(err)
+        res.status(500).json({error:'something went wrong in blocked clients'})
+    }
+}
+clientCtrl.updateVerification=async(req,res)=>{
+    try{
+        const {cid}=req.params
+        const body=req.body
+        const client=await Client.findByIdAndUpdate({_id:cid},body,{new:true})
+        if(!client){
+          return res.status(400).json({error:'something went wrong'})
+        }
+        res.json(client)
+    }catch(err){
+        console.log(err)
+        res.status(500).json({error:'something went wrong in verifying clients'})
+    }
+}
 clientCtrl.getClientsUsingBooks=async(req,res)=>{
   
     try{

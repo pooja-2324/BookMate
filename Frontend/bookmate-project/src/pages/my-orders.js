@@ -317,11 +317,12 @@ export default function MyOrders() {
     console.log("Returning book with ID:", id); // Debugging: Log book ID
     const confirm = window.confirm("Are you sure?");
     if (confirm) {
-      await dispatch(returnBook(id));
+       dispatch(returnBook(id)).unwrap();
       setReturnMsg((prevState) => ({
         ...prevState,
         [id]: "Book returned successfully",
       }));
+      
     }
   };
 
@@ -455,7 +456,7 @@ export default function MyOrders() {
                     >
                       Return
                     </button>
-                    {ele.rent?.rentedBookStatus === "completed" && (
+                    {ele.rent?.rentedBookStatus === "returnPending" && (
                       <p className="text-green-600 italic mt-2">
                         Book returned successfully
                       </p>

@@ -8,6 +8,28 @@ import Rent from '../models/rental-model.js';
 
 const bookCtrl={}
 
+
+bookCtrl.count=async(req,res)=>{
+    try{
+        const count=await Book.countDocuments()
+        res.json(count)
+    }catch(err){
+        res.status(500).json({error:'something went wrong'})
+    }
+}
+
+bookCtrl.blocked=async(req,res)=>{
+    try{
+        const books=await Book.find({isVerified:false}).populate('vendor')
+        if(!books){
+            return res.status(400).json({error:'books not found'})
+        }
+        res.json(books)
+    }catch(err){
+        console.log(err)
+        res.status(500).json({error:'something went wrong'})
+    }
+}
 bookCtrl.create=async(req,res)=>{
     const errors=validationResult(req)
   
@@ -76,19 +98,29 @@ bookCtrl.allBooks=async(req,res)=>{
         res.status(500).json({error:'something went wrong'})
     }
 }
-bookCtrl.verified=async(req,res)=>{
-    try{
-        const books=await Book.find({isVerified:true}).populate('vendor').populate('reviews')
-        if(!books){
-            return res.status(400).json({error:'no books verified'})
-        }
-        res.json(books)
+bookCtrl.verified = async (req, res) => {
+    try {
+        const books = await Book.find({ isVerified: true })
+            .populate('vendor')
+            .populate({
+                path: 'reviews',
+                populate: {
+                    path: 'reviewBy',
+                    // Ensure 'User' is the correct model name
+                }
+            });
 
-    }catch(err){
-        console.log(err)
-        res.status(500).json({error:'something went wrong'})
+        if (!books || books.length === 0) {
+            return res.status(400).json({ error: 'No verified books found' });
+        }
+
+        res.json(books);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Something went wrong' });
     }
-}
+};
+
 bookCtrl.update=async(req,res)=>{
     const errors=validationResult(req)
     if(!errors.isEmpty()){
@@ -131,10 +163,11 @@ bookCtrl.withdraw=async(req,res)=>{
         }
         // vendor.uploadedBooks.push(book._id)
         // await vendor.save()
-       const bookIndex=await Book?.findIndex(ele=>ele._id==id)
-       console.log('bookIndex',bookIndex)
-       vendor.splice(bookIndex,1)
-       await vendor.save()
+       
+       await Vendor.updateOne(
+        { _id: vendor._id },
+        { $pull: { uploadedBooks: { _id: book._id } } }
+      );
        res.json({deletesuccessfully:book})
     }catch(err){
         console.log(err)

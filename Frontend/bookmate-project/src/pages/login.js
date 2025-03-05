@@ -41,8 +41,10 @@ export default function Login() {
         handleLogin(response?.data);
         if (response?.data?.role === "vendor") {
           navigate("/vhome");
-        } else {
-          navigate("/");
+        } else if(response?.data?.role==='admin'){
+          navigate("/admin-dashboard");
+        }else{
+          navigate('/')
         }
       } catch (err) {
         console.log(err.response?.data);

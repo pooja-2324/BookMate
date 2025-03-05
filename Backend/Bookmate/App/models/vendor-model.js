@@ -26,6 +26,7 @@ const vendorSchema=new Schema({
         type:Number,
         default:0
     },
+    
 },{timestamps:true})
 
 const Vendor=model('Vendor',vendorSchema)

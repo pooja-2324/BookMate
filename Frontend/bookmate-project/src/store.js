@@ -7,6 +7,8 @@ import reviewReducer from './slices/reviewSlice'
 import orderReducer from './slices/orderSlice'
 import buyReducer from './slices/buySlice'
 import paymentReducer from './slices/paymentSlice'
+import adminReducer from './slices/adminSlice'
+import vendorReducer from './slices/vendorSlice'
 const store=configureStore({
     reducer:{
         books:booksReducer,
@@ -16,7 +18,10 @@ const store=configureStore({
         reviews:reviewReducer,
         orders:orderReducer,
         buys:buyReducer,
-        payments:paymentReducer
+        payments:paymentReducer,
+        admin:adminReducer,
+        vendors:vendorReducer
+
     }
 })
 export default store
