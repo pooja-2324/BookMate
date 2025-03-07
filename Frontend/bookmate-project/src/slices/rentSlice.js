@@ -17,7 +17,7 @@ export const uploadRentDetails=createAsyncThunk('rents/uploadRentDetails',async(
     }
     
 })
-export const fetchRentDetails=createAsyncThunk('rents/fetchRentDetails',async(bid,{rejectWithValue})=>{
+export const fetchRentDetails=createAsyncThunk('rents/fetchRentDetails',async({bid},{rejectWithValue})=>{
     try{
         const response=await axios.get(`/api/book/${bid}/rent`,{
             headers:{Authorization:localStorage.getItem('token')}
@@ -126,6 +126,7 @@ const rentSlice=createSlice({
     name:'rents',
     initialState:{
         rentData:[],
+        all:[],
         serverError:null,
         editId:null
     },
@@ -145,7 +146,7 @@ const rentSlice=createSlice({
         })
         builder.addCase(fetchRentDetails.fulfilled,(state,action)=>{
             console.log('fetch',typeof(action.payload))
-            state.rentData=(action.payload)
+            state.all=(action.payload)
         })
         builder.addCase(fetchRentDetails.rejected,(state,action)=>{
             state.serverError=action.payload

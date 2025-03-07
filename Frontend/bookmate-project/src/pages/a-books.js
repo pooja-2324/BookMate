@@ -1,8 +1,12 @@
 import { verifiedBooks, blockedBooks, verify } from '../slices/bookSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect, useState } from 'react';
-
+import { useContext, useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AiOutlineUser ,AiOutlineLogout} from 'react-icons/ai';
+import AuthContext from '../context/authContext';
 export default function AdminBooks() {
+  const navigate=useNavigate()
+  const {handleLogout}=useContext(AuthContext)
   const dispatch = useDispatch();
   const { bookData, blocked } = useSelector(state => state.books);
   const [showReviews, setShowReviews] = useState({});
@@ -23,7 +27,36 @@ export default function AdminBooks() {
   };
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+    <div className="min-h-screen flex flex-col bg-[#F4F1DE]">
+      <header className="w-full h-16 bg-[#2C3E50] text-white p-4 flex justify-between items-center px-6 shadow-md">
+                      <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+                      <nav>
+                          <ul className="flex space-x-4 items-center">
+                              <li><Link to="/admin-users" className="text-lg font-medium text-white-600 hover:text-blue-800">Vendors</Link></li>
+                          <li><Link to="/admin-clients" className="text-lg font-medium text-white-600 hover:text-blue-800">Clients</Link></li>
+                          <li><Link to="/admin-books" className="text-lg font-medium text-white-600 hover:text-blue-800">Books</Link></li>
+                      
+                              <li>
+                                  <Link to="/admin-profile" className="flex items-center gap-2 text-white hover:underline">
+                                      <AiOutlineUser size={24} /> Profile
+                                  </Link>
+                              </li>
+                               <li>
+                                  <button  onClick={() => {
+                  const confirm = window.confirm("Logged out?");
+                  if (confirm) {
+                    handleLogout();
+                    localStorage.removeItem("token");
+                    navigate("/login");
+                  }
+                }} className="flex items-center gap-2 text-white hover:underline">
+                                 <AiOutlineLogout size={24} /> Logout
+                                    </button>
+                                </li>
+                          </ul>
+                      </nav>
+                  </header>
+      
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Verified Books({bookData.length})</h2>
       {bookData.length > 0 ? (
         <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

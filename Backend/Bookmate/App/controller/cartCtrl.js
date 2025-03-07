@@ -10,7 +10,13 @@ cartCtrl.listAll=async(req,res)=>{
         const client=req.currentUser.userId
         console.log('client',client)
         const cartDatas=await Cart.find({client})
-        .populate('book')
+        .populate({
+            path: 'book',
+            populate: {
+                path: 'vendor',
+               
+            }
+        })
         .populate('rent')
         .populate('buy')
         res.json(cartDatas)

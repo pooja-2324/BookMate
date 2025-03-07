@@ -227,7 +227,14 @@ bookCtrl.myBooks=async(req,res)=>{
     try{
         const user=req.currentUser.userId
         console.log('user',user)
-        const response=await Book.find({vendor:user})
+        const response=await Book.find({vendor:user}).populate('vendor').populate({
+            path: 'reviews',
+            populate: {
+                path: 'reviewBy',
+               
+            }
+        });
+
         if (!response) {
             return res.status(404).json({ error: 'No books found for this vendor' });
         }

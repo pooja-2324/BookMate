@@ -1,288 +1,3 @@
-// import { useSelector,useDispatch} from "react-redux"
-// import { fetchClient } from "../slices/clientSlice"
-// import { returnBook } from "../slices/rentSlice"
-// import { createReviews } from "../slices/reviewSlice"
-// import { useEffect,useContext,useState } from "react"
-// import {Rating,ThinStar} from '@smastrom/react-rating'
-// import '@smastrom/react-rating/style.css';
-
-
-// import AuthContext from "../context/authContext"
-// export default function MyOrders(){
-//     const {clientData}=useSelector(state=>state.clients)
-//     const [returnMsg,setReturnMsg]=useState({})
-//     const [reviewText,setreviewText]=useState({})
-//     const [rating,setRating]=useState({})
-//     const {userState}=useContext(AuthContext)
-//     const dispatch=useDispatch()
-   
-//     const {rentData}=useSelector(state=>state.rents)
-//      console.log('returmsg',returnMsg)
-//     useEffect(()=>{
-//         dispatch(fetchClient({id:userState.user._id}))
-        
-//     },[])
-//     const handleReturn=async(id)=>{
-//         const confirm=window.confirm('Are you sure?')
-//         if(confirm){
-//             await dispatch(returnBook(id))
-//             setReturnMsg((prevState) => ({
-//                 ...prevState,
-//                 [id]: 'Book returned successfully',
-//               }));
-           
-            
-
-//         }
-        
-//     }
-//     const handleSubmit=(bookId)=>{
-//         if(!reviewText[bookId]||!rating[bookId]){
-//             alert('please provide both reviews and ratings')
-//             return
-//         }
-//         const reviewData={
-//             reviewFor:'Book',
-//             reviewEntityId:bookId,
-//             reviewText:reviewText[bookId],
-//             rating:rating[bookId]
-//         }
-//         dispatch(createReviews({review:reviewData}))
-//         alert('review submitted')
-//         setRating({...rating,[bookId]:""})
-//         setreviewText({...reviewText,[bookId]:''})
-
-//     }
-//     console.log('clientdatabook',clientData.rentedBooks)
-//     return(
-//         <div>
-//             <h3>My Orders-{clientData?.rentedBooks?.length}</h3>
-            
-//           {clientData?.rentedBooks?.map(ele=>(
-//             <div key={ele._id}><img style={{
-//                 width: "160px",
-//                 textAlign: "center",
-//                 boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-//                 borderRadius: "8px",
-//                 padding: "10px",
-//                 backgroundColor: "#FEF3C7"
-//             }}
-//              src={ele.book?.coverImage}/>
-//             <p>vendor:{ele.rent?.vendor}</p>
-//             <p>order placed on :{ele.rent?.updatedAt.split('T')[0]}</p>
-//             <p>Due On:{ele.rent?.dueDate.split('T')[0]}</p>
-//             <button onClick={()=>{handleReturn(ele.book._id)}}
-//                 disabled={ele?.rent?.rentedBookStatus=='completed'}>Return</button>
-           
-//            {ele.rent?.rentedBookStatus=='completed'&&<p style={{color:'green',fontStyle:'italic'}}>Book returned Successfully</p>}
-
-//            <div>
-//             <p>Add Your Comments</p>
-//             <textarea
-//             placeholder="Write your reviews"
-//             value={reviewText[ele.book?._id]}
-//             onChange={(e)=>{
-//                 const updatedReviews={...reviewText}
-//                 updatedReviews[ele.book._id]=e.target.value
-//                 setreviewText(updatedReviews)
-//             }}
-//             />
-//              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10px' }}>
-//                             <Rating
-//                                 style={{ maxWidth: 150 }}
-//                                 value={rating[ele.book._id] || 0}
-//                                 onChange={(value) => {
-//                                     const updatedRatings = { ...rating };
-//                                     updatedRatings[ele.book._id] = value;
-//                                     setRating(updatedRatings);
-//                                 }}
-//                                 itemShapes={ThinStar}
-//                                 activeFillColor="#ffb700"
-//                                 inactiveFillColor="#ccc"
-//                             />
-//                         </div>
-//             <button onClick={()=>{handleSubmit(ele.book._id)}}
-//                 disabled={!reviewText[ele.book._id]}>
-//                     Submit</button>
-//            </div>
-//            <hr/>
-//             </div>
-            
-//           ))}
-        
-//         </div>
-//     )
-// }
-
-// import { useSelector, useDispatch } from "react-redux";
-// import { myOrders } from "../slices/orderSlice";
-// import { returnBook } from "../slices/rentSlice";
-// import { createReviews } from "../slices/reviewSlice";
-// import { useEffect, useContext, useState } from "react";
-// import { Rating, ThinStar } from "@smastrom/react-rating";
-// import "@smastrom/react-rating/style.css";
-// import AuthContext from "../context/authContext";
-
-// export default function MyOrders() {
-//   const { orderData } = useSelector((state) => state.orders);
-//   const [returnMsg, setReturnMsg] = useState({});
-//   const [reviewText, setReviewText] = useState({});
-//   const [rating, setRating] = useState({});
-//   const [uploadedImages, setUploadedImages] = useState({});
-//   const [submittedReviews, setSubmittedReviews] = useState({});
-//   const { userState } = useContext(AuthContext);
-//   const dispatch = useDispatch();
-
-//   useEffect(() => {
-//     dispatch(myOrders());
-//   }, [dispatch]);
-
-//   const handleReturn = async (id) => {
-//     const confirm = window.confirm("Are you sure?");
-//     if (confirm) {
-//       await dispatch(returnBook(id));
-//       setReturnMsg((prevState) => ({
-//         ...prevState,
-//         [id]: "Book returned successfully",
-//       }));
-//     }
-//   };
-
-//   const handleSubmit = async (bookId) => {
-//     if (!reviewText[bookId] || !rating[bookId]) {
-//       alert("Please provide both reviews and ratings");
-//       return;
-//     }
-
-//     const reviewData = new FormData();
-//     reviewData.append("reviewFor", "Book");
-//     reviewData.append("reviewEntityId", bookId);
-//     reviewData.append("reviewText", reviewText[bookId]);
-//     reviewData.append("rating", rating[bookId]);
-//     if (uploadedImages[bookId]) {
-//       reviewData.append("photo", uploadedImages[bookId]);
-//     }
-
-//     await dispatch(createReviews(reviewData));
-//     alert("Review submitted");
-//     setSubmittedReviews({ ...submittedReviews, [bookId]: true });
-//   };
-
-//   const handleFileChange = (e, bookId) => {
-//     setUploadedImages({ ...uploadedImages, [bookId]: e.target.files[0] });
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-gray-100 p-6">
-//       <h3 className="text-2xl font-bold text-gray-800 text-center mb-4">
-//         My Orders - {orderData.length}
-//       </h3>
-
-//       {orderData.map((ele) => {
-//         const orderType = ele.rent ? "rent" : "buy";
-
-//         return (
-//           <div
-//             key={ele._id}
-//             className="bg-white shadow-md rounded-lg p-4 mb-6 max-w-4xl mx-auto"
-//           >
-//             <div className="flex gap-4">
-//               <img
-//                 className="w-32 h-40 object-cover rounded-md shadow-sm bg-yellow-100 p-2"
-//                 src={ele.book?.coverImage}
-//                 alt="Book Cover"
-//               />
-//               <div className="flex-1">
-//                 <h2 className="text-xl font-semibold text-gray-700">
-//                   {ele.book?.modifiedTitle}
-//                 </h2>
-//                 <p className="text-gray-600">
-//                   Vendor: {ele.book?.vendor?.name}
-//                 </p>
-//                 <p className="text-gray-600">
-//                   Order placed on: {ele.rent?.updatedAt?.split("T")[0]}
-//                 </p>
-//                 {orderType === "rent" && (
-//                   <p className="text-gray-600">
-//                     Due On: {ele.rent?.dueDate?.split("T")[0]}
-//                   </p>
-//                 )}
-
-//                 {orderType === "rent" && (
-//                   <>
-//                     <button
-//                       onClick={() => handleReturn(ele.book._id)}
-//                       disabled={ele?.rent?.rentedBookStatus === "completed"}
-//                       className={`mt-2 px-4 py-2 rounded-lg text-white font-semibold ${
-//                         ele?.rent?.rentedBookStatus === "completed"
-//                           ? "bg-gray-400 cursor-not-allowed"
-//                           : "bg-red-500 hover:bg-red-600"
-//                       } transition duration-300`}
-//                     >
-//                       Return
-//                     </button>
-//                     {ele.rent?.rentedBookStatus === "completed" && (
-//                       <p className="text-green-600 italic mt-2">
-//                         Book returned successfully
-//                       </p>
-//                     )}
-//                   </>
-//                 )}
-//               </div>
-//             </div>
-
-//             <div className="mt-4">
-//               <p className="text-gray-700 font-semibold">Add Your Comments</p>
-//               <textarea
-//                 className="w-full border rounded-lg p-2 mt-2"
-//                 placeholder="Write your review"
-//                 value={reviewText[ele.book?._id] || ""}
-//                 onChange={(e) =>
-//                   setReviewText({ ...reviewText, [ele.book?._id]: e.target.value })
-//                 }
-//                 // disabled={submittedReviews[ele.book?._id]}
-//               />
-//               <div className="flex justify-center items-center mt-3">
-//                 <Rating
-//                   style={{ maxWidth: 150 }}
-//                   value={rating[ele.book?._id] || 0}
-//                   onChange={(value) =>
-//                     setRating({ ...rating, [ele.book?._id]: value })
-//                   }
-//                   itemShapes={ThinStar}
-//                   activeFillColor="#ffb700"
-//                   inactiveFillColor="#ccc"
-//                   // disabled={submittedReviews[ele.book?._id]}
-//                 />
-//               </div>
-//               <input
-//                 type="file"
-//                 accept="image/*"
-//                 onChange={(e) => handleFileChange(e, ele.book?._id)}
-//                 // disabled={submittedReviews[ele.book?._id]}
-//                 className="mt-2"
-//               />
-//               <button
-//                 onClick={() => handleSubmit(ele.book?._id)}
-//                 // disabled={submittedReviews[ele.book?._id] || !reviewText[ele.book?._id]}
-//                 className={`mt-3 px-4 py-2 rounded-lg text-white font-semibold ${
-//                   submittedReviews[ele.book?._id]
-//                     ? "bg-gray-400 cursor-not-allowed"
-//                     : "bg-blue-500 hover:bg-blue-600"
-//                 } transition duration-300`}
-//               >
-//                 Submit
-//               </button>
-//             </div>
-//           </div>
-//         );
-//       })}
-//     </div>
-//   );
-// }
-
-
-
 import { useSelector, useDispatch } from "react-redux";
 import { myOrders } from "../slices/orderSlice";
 import { returnBook } from "../slices/rentSlice";
@@ -291,19 +6,19 @@ import { useEffect, useContext, useState } from "react";
 import { Rating, ThinStar } from "@smastrom/react-rating";
 import "@smastrom/react-rating/style.css";
 import AuthContext from "../context/authContext";
-import {Link} from 'react-router-dom'
-import { AiOutlineShoppingCart,AiOutlineUser } from "react-icons/ai";
+import { Link } from "react-router-dom";
+import { AiOutlineShoppingCart, AiOutlineUser,AiOutlineHome, AiOutlineLogout } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 
 export default function MyOrders() {
-  const {handleLogout}=useContext(AuthContext)
+  const { handleLogout } = useContext(AuthContext);
   const navigate = useNavigate();
   const { orderData } = useSelector((state) => state.orders);
-  const [returnMsg, setReturnMsg] = useState({});
   const [reviewText, setReviewText] = useState({});
   const [rating, setRating] = useState({});
   const [photos, setPhotos] = useState({}); // State to store selected photos
   const [submittedReviews, setSubmittedReviews] = useState({}); // State to store submitted reviews
+  const [returnedBooks, setReturnedBooks] = useState({}); // Track returned books
   const { userState } = useContext(AuthContext);
   const dispatch = useDispatch();
 
@@ -317,12 +32,30 @@ export default function MyOrders() {
     console.log("Returning book with ID:", id); // Debugging: Log book ID
     const confirm = window.confirm("Are you sure?");
     if (confirm) {
-       dispatch(returnBook(id)).unwrap();
-      setReturnMsg((prevState) => ({
-        ...prevState,
-        [id]: "Book returned successfully",
-      }));
-      
+      try {
+        // Disable the return button immediately
+        setReturnedBooks((prevState) => ({
+          ...prevState,
+          [id]: "pending", // Mark as pending
+        }));
+
+        // Dispatch the returnBook action
+        await dispatch(returnBook(id)).unwrap();
+
+        // Update the state to mark the book as returned
+        setReturnedBooks((prevState) => ({
+          ...prevState,
+          [id]: "returned", // Mark as returned
+        }));
+      } catch (error) {
+        console.error("Error returning book:", error);
+        // Re-enable the return button if the action fails
+        setReturnedBooks((prevState) => ({
+          ...prevState,
+          [id]: undefined,
+        }));
+        alert("Failed to return the book. Please try again.");
+      }
     }
   };
 
@@ -331,7 +64,7 @@ export default function MyOrders() {
       alert("Please provide both reviews and ratings");
       return;
     }
-  
+
     try {
       const reviewData = {
         reviewFor: "Book",
@@ -339,20 +72,20 @@ export default function MyOrders() {
         reviewText: reviewText[bookId],
         rating: rating[bookId],
       };
-  
+
       // Dispatch the createReviews action
       const response = await dispatch(createReviews({ review: reviewData })).unwrap();
-  
+
       console.log("Review submitted successfully:", response); // Log the response
-  
+
       // Store the submitted review data in state
       setSubmittedReviews((prevState) => ({
         ...prevState,
         [bookId]: response.review._id, // Ensure response contains the review data
       }));
-  
+
       alert("Review submitted successfully");
-  
+
       // Reset form states
       setRating({ ...rating, [bookId]: "" });
       setReviewText({ ...reviewText, [bookId]: "" });
@@ -365,7 +98,7 @@ export default function MyOrders() {
 
   const handlePhotos = (bookId) => {
     const reviewId = submittedReviews[bookId];
-    console.log('review id',bookId) // Get the review ID from the submitted reviews
+    console.log("review id", bookId); // Get the review ID from the submitted reviews
     if (reviewId) {
       navigate(`/review-photo/${reviewId}`); // Navigate to the ReviewPhotos component with the review ID
     } else {
@@ -374,14 +107,15 @@ export default function MyOrders() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-
-<header className="w-full h-8 bg-red-700 text-white p-4 flex justify-between items-center px-6 left-0 top-0">
+    <div className="min-h-screen bg-[#F4F1DE] p-6">
+      {/* Header */}
+      <header className="w-full h-16 bg-[#2C3E50] text-white p-4 flex justify-between items-center px-6 left-0 top-0 shadow-md">
         <h1 className="text-2xl font-bold">Bookmate</h1>
         <div className="ml-auto flex gap-4">
           <Link to="/profile" className="flex items-center gap-2 text-white hover:underline">
             <AiOutlineUser size={24} /> Profile
           </Link>
+          <Link to='/home'><AiOutlineHome size={24}/>Home</Link>
           <Link to="/cart" className="flex items-center gap-2 text-white hover:underline">
             <AiOutlineShoppingCart size={24} /> Cart
           </Link>
@@ -397,246 +131,128 @@ export default function MyOrders() {
               }}
               className="text-white hover:underline"
             >
+              <AiOutlineLogout size={24}/>
               Logout
             </button>
           </li>
         </div>
       </header>
 
-      <h3 className="text-2xl font-bold text-gray-800 text-center mb-4">
-        My Orders - {orderData.length}
-      </h3>
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto mt-6">
+        <h3 className="text-2xl font-bold text-[#1A1A1A] text-center mb-6">
+          My Orders - {orderData.length}
+        </h3>
 
-      {orderData.map((ele) => {
-        const orderType = ele.rent ? "rent" : "buy";
+        {orderData.map((ele) => {
+          const orderType = ele.rent ? "rent" : "buy";
+          const isReturned = returnedBooks[ele.book?._id] === "returned";
+          const isReturnPending = returnedBooks[ele.book?._id] === "pending";
 
-        return (
-          <div
-            key={ele._id}
-            className="bg-white shadow-md rounded-lg p-4 mb-6 max-w-4xl mx-auto"
-          >
-            <div className="flex gap-4">
-              <img
-                className="w-32 h-40 object-cover rounded-md shadow-sm bg-yellow-100 p-2"
-                src={ele.book?.coverImage}
-                alt="Book Cover"
-              />
-              <div className="flex-1">
-                <h2 className="text-xl font-semibold text-gray-700">
-                  {ele.book?.modifiedTitle}
-                </h2>
-                <p className="text-gray-600">
-                  Vendor: {ele.vendor?.name}
-                </p>
-                <p className="text-gray-600">
-                  Order placed on:{" "}
-                  {(ele.rent?.rentalStartDate || ele.buy?.updatedAt)?.split("T")[0]}
-                </p>
-                {orderType === "rent" && (
-                  <p className="text-gray-600">
-                    Due On: {ele.rent?.dueDate?.split("T")[0]}
-                  </p>
-                )}
-                {orderType === "buy" && (
-                  <p className="text-gray-600">
-                    Purchase Date: {ele.buy?.updatedAt?.split("T")[0]}
-                  </p>
-                )}
-
-                {orderType === "rent" && (
-                  <>
-                    <button
-                      onClick={() => handleReturn(ele.book._id)}
-                      disabled={ele?.rent?.rentedBookStatus === "completed"}
-                      className={`mt-2 px-4 py-2 rounded-lg text-white font-semibold ${
-                        ele?.rent?.rentedBookStatus === "completed"
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-red-500 hover:bg-red-600"
-                      } transition duration-300`}
-                    >
-                      Return
-                    </button>
-                    {ele.rent?.rentedBookStatus === "returnPending" && (
-                      <p className="text-green-600 italic mt-2">
-                        Book returned successfully
-                      </p>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
-
-            <div className="mt-4">
-              <p className="text-gray-700 font-semibold">Add Your Comments</p>
-              <textarea
-                className="w-full border rounded-lg p-2 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="Write your reviews"
-                value={reviewText[ele.book?._id] || ""}
-                onChange={(e) => {
-                  setReviewText({ ...reviewText, [ele.book?._id]: e.target.value });
-                }}
-              />
-              <div className="flex justify-center items-center mt-3">
-                <Rating
-                  style={{ maxWidth: 150 }}
-                  value={rating[ele.book?._id] || 0}
-                  onChange={(value) => setRating({ ...rating, [ele.book?._id]: value })}
-                  itemShapes={ThinStar}
-                  activeFillColor="#ffb700"
-                  inactiveFillColor="#ccc"
-                />
-              </div>
-
-              <button
-                onClick={() => handleSubmit(ele.book?._id)}
-                // disabled={submittedReviews[ele.book?._id] || !reviewText[ele.book?._id]}
-                className="mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"
-              >
-                Submit
-              </button>
-            </div>
-
-            {/* Add Photos Button */}
-            <button
-              onClick={() => handlePhotos(ele.book?._id)}
-              // disabled={!submittedReviews[ele.book?._id] || !reviewText[ele.book?._id]}
-              className="mt-3 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300"
+          return (
+            <div
+              key={ele._id}
+              className="bg-[#F8F8F8] shadow-md rounded-lg p-6 mb-6"
             >
-              Add Photos
-            </button>
-          </div>
-        );
-      })}
+              <div className="flex gap-6">
+                {/* Book Cover Image */}
+                <img
+                  className="w-32 h-48 object-cover rounded-md shadow-sm"
+                  src={ele.book?.coverImage}
+                  alt="Book Cover"
+                />
+
+                {/* Book Details */}
+                <div className="flex-1">
+                  <h2 className="text-xl font-semibold text-[#1A1A1A]">
+                    {ele.book?.modifiedTitle}
+                  </h2>
+                  <p className="text-[#3D405B]">Vendor: {ele.vendor?.name}</p>
+                  <p className="text-[#3D405B]">
+                    Order placed on:{" "}
+                    {(ele.rent?.rentalStartDate || ele.buy?.updatedAt)?.split("T")[0]}
+                  </p>
+                  {orderType === "rent" && (
+                    <p className="text-[#3D405B]">
+                      Due On: {ele.rent?.dueDate?.split("T")[0]}
+                    </p>
+                  )}
+                  {orderType === "buy" && (
+                    <p className="text-[#3D405B]">
+                      Purchase Date: {ele.buy?.updatedAt?.split("T")[0]}
+                    </p>
+                  )}
+
+                  {/* Return Button */}
+                  {orderType === "rent" && (
+                    <>
+                      <button
+                        onClick={() => handleReturn(ele.book._id)}
+                        disabled={isReturned || isReturnPending}
+                        className={`mt-4 px-4 py-2 rounded-lg text-white font-semibold ${
+                          isReturned || isReturnPending
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-[#E07A5F] hover:bg-[#D56A4F]"
+                        } transition-colors`}
+                      >
+                        {isReturnPending ? "Returning..." : "Return"}
+                      </button>
+                      {isReturned && (
+                        <p className="text-green-600 italic mt-2">
+                          Book returned successfully
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Review Section */}
+              <div className="mt-6">
+                <p className="text-[#1A1A1A] font-semibold">Add Your Comments</p>
+                <textarea
+                  className="w-full border border-[#3D405B] rounded-lg p-2 mt-2 focus:outline-none focus:ring-2 focus:ring-[#E07A5F]"
+                  placeholder="Write your reviews"
+                  value={reviewText[ele.book?._id] || ""}
+                  onChange={(e) => {
+                    setReviewText({ ...reviewText, [ele.book?._id]: e.target.value });
+                  }}
+                  disabled={isReturned}
+                />
+                <div className="flex justify-center items-center mt-3">
+                  <Rating
+                    style={{ maxWidth: 150 }}
+                    value={rating[ele.book?._id] || 0}
+                    onChange={(value) => setRating({ ...rating, [ele.book?._id]: value })}
+                    itemShapes={ThinStar}
+                    activeFillColor="#ffb700"
+                    inactiveFillColor="#ccc"
+                    disabled={isReturned}
+                  />
+                </div>
+
+                {/* Submit Review Button */}
+                <button
+                  onClick={() => handleSubmit(ele.book?._id)}
+                  //disabled={ !reviewText[ele.book?._id]}
+                  className="mt-4 px-4 py-2 bg-[#3D405B] text-white rounded-lg hover:bg-[#2C3E50] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                  Submit Review
+                </button>
+
+                {/* Add Photos Button */}
+                <button
+                  onClick={() => handlePhotos(ele.book?._id)}
+                  //disabled={!submittedReviews[ele.book?._id]}
+                  className="mt-4 px-4 py-2 bg-[#E07A5F] text-white rounded-lg hover:bg-[#D56A4F] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                  Add Photos
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
-// import { useSelector, useDispatch } from "react-redux";
-// import { myOrders } from "../slices/orderSlice";
-// import { returnBook } from "../slices/rentSlice";
-// import { createReviews } from "../slices/reviewSlice";
-// import { useEffect, useContext, useState } from "react";
-// import { Rating, ThinStar } from "@smastrom/react-rating";
-// import "@smastrom/react-rating/style.css";
-// import AuthContext from "../context/authContext";
-
-// export default function MyOrders() {
-//   const { orderData } = useSelector((state) => state.orders);
-//   const [returnMsg, setReturnMsg] = useState({});
-//   const [reviewText, setReviewText] = useState({});
-//   const [rating, setRating] = useState({});
-//   const [photos, setPhotos] = useState({});
-//   const { userState } = useContext(AuthContext);
-//   const dispatch = useDispatch();
-
-//   useEffect(() => {
-//     dispatch(myOrders());
-//   }, [dispatch]);
-
-//   const handleReturn = async (id) => {
-//     if (window.confirm("Are you sure?")) {
-//       await dispatch(returnBook(id));
-//       setReturnMsg((prev) => ({ ...prev, [id]: "Book returned successfully" }));
-//     }
-//   };
-
-//   const handleFileChange = (bookId, event) => {
-//     setPhotos((prevPhotos) => ({
-//       ...prevPhotos,
-//       [bookId]: event.target.files,
-//     }));
-//   };
-
-//   const handleSubmit = async (bookId) => {
-//     if (!reviewText[bookId] || !rating[bookId]) {
-//       alert("Please provide both review and rating");
-//       return;
-//     }
-
-//     const formData = new FormData();
-//     formData.append("reviewFor", "Book");
-//     formData.append("reviewEntityId", bookId);
-//     formData.append("reviewText", reviewText[bookId]);
-//     formData.append("rating", rating[bookId]);
-
-//     if (photos[bookId]?.length) {
-//       Array.from(photos[bookId]).forEach((file) => {
-//         formData.append("photos", file);
-//       });
-//     }
-
-//     try {
-//       await dispatch(createReviews({ review: formData }));
-//       alert("Review submitted successfully");
-//       setReviewText({ ...reviewText, [bookId]: "" });
-//       setRating({ ...rating, [bookId]: 0 });
-//       setPhotos({ ...photos, [bookId]: [] });
-//     } catch (error) {
-//       alert("Failed to submit review. Please try again.");
-//     }
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-gray-100 p-6">
-//       <h3 className="text-2xl font-bold text-gray-800 text-center mb-4">
-//         My Orders - {orderData.length}
-//       </h3>
-
-//       {orderData.map((ele) => (
-//         <div key={ele._id} className="bg-white shadow-md rounded-lg p-4 mb-6 max-w-4xl mx-auto">
-//           <div className="flex gap-4">
-//             <img className="w-32 h-40 object-cover rounded-md" src={ele.book?.coverImage} alt="Book Cover" />
-//             <div className="flex-1">
-//               <h2 className="text-xl font-semibold">{ele.book?.modifiedTitle}</h2>
-//               <p>Vendor: {ele.book?.vendor?.name}</p>
-//               <p>Order placed on: {ele.rent?.updatedAt?.split("T")[0]}</p>
-//               {ele.rent && <p>Due On: {ele.rent?.dueDate?.split("T")[0]}</p>}
-//               <button
-//                 onClick={() => handleReturn(ele.book._id)}
-//                 disabled={ele?.rent?.rentedBookStatus === "completed"}
-//                 className="mt-2 px-4 py-2 bg-red-500 text-white rounded-lg"
-//               >
-//                 Return
-//               </button>
-//               {returnMsg[ele.book._id] && <p className="text-green-600">{returnMsg[ele.book._id]}</p>}
-//             </div>
-//           </div>
-
-//           <div className="mt-4">
-//             <textarea
-//               className="w-full border rounded-lg p-2 mt-2"
-//               placeholder="Write your reviews"
-//               value={reviewText[ele.book?._id] || ""}
-//               onChange={(e) => setReviewText({ ...reviewText, [ele.book?._id]: e.target.value })}
-//             />
-//             <div className="flex justify-center mt-3">
-//               <Rating
-//                 style={{ maxWidth: 150 }}
-//                 value={rating[ele.book?._id] || 0}
-//                 onChange={(value) => setRating({ ...rating, [ele.book?._id]: value })}
-//                 itemShapes={ThinStar}
-//               />
-//             </div>
-
-//             <div className="mt-3">
-//               <input
-//                 type="file"
-//                 accept="image/*"
-//                 multiple
-//                 onChange={(e) => handleFileChange(ele.book?._id, e)}
-//                 className="hidden"
-//                 id={`file-input-${ele.book?._id}`}
-//               />
-//               <label htmlFor={`file-input-${ele.book?._id}`} className="px-4 py-2 bg-blue-500 text-white rounded-lg cursor-pointer">
-//                 Add Photos
-//               </label>
-//             </div>
-
-//             <button onClick={() => handleSubmit(ele.book?._id)} className="mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg">
-//               Submit
-//             </button>
-//           </div>
-//         </div>
-//       ))}
-//     </div>
-//   );
-// }

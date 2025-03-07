@@ -1,10 +1,13 @@
 import { useDispatch, useSelector } from "react-redux";
 import { upload, updateBook } from "../slices/bookSlice";
 import { uploadBuy } from "../slices/buySlice";
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useContext } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { AiOutlineAccountBook, AiOutlineLogout } from "react-icons/ai";
+import AuthContext from "../context/authContext";
 
 export default function Upload() {
+  const { handleLogout } = useContext(AuthContext);
   const { serverError, editId, uploaded } = useSelector((state) => state.books);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -42,9 +45,11 @@ export default function Upload() {
       setForm({ ...book });
     }
   }, [editId, uploaded]);
-const resetForm=()=>{
-    setForm(formInitialValue)
-}
+
+  const resetForm = () => {
+    setForm(formInitialValue);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     runClientValidation();
@@ -53,13 +58,12 @@ const resetForm=()=>{
         dispatch(updateBook({ form, id: editId }));
         navigate("/vhome");
       } else {
-        dispatch(upload({ form,resetForm }))
-          .then((action) => {
-            if (action?.payload?._id) {
-              navigate(`/book/${action.payload._id}/uploadrentDetails`);
-              dispatch(uploadBuy({ bid: action.payload._id }));
-            }
-          });
+        dispatch(upload({ form, resetForm })).then((action) => {
+          if (action?.payload?._id) {
+            navigate(`/book/${action.payload._id}/uploadrentDetails`);
+            dispatch(uploadBuy({ bid: action.payload._id }));
+          }
+        });
       }
     } else {
       setClientError(errors);
@@ -67,95 +71,157 @@ const resetForm=()=>{
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gray-100 py-10">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Share Here..!</h2>
-      {serverError && (
-        <ul className="text-red-500 text-sm mb-4">
-          {Array.isArray(serverError) ? (
-            serverError.map((ele, index) => <li key={index}>{ele}</li>)
-          ) : (
-            <li>{serverError}</li>
+    <div className="min-h-screen flex flex-col bg-[#F4F1DE]">
+      {/* Header */}
+      <header className="w-full h-16 bg-[#2C3E50] text-white p-4 flex justify-between items-center px-6 left-0 top-0 shadow-md">
+        <h1 className="text-2xl font-bold">Bookmate</h1>
+        <nav>
+          <ul className="flex space-x-4 items-center">
+            <li>
+              <Link to="/profile" className="flex items-center gap-2 text-white hover:underline">
+                <AiOutlineAccountBook size={24} /> Profile
+              </Link>
+            </li>
+            <li>
+              <button  onClick={() => {
+                const confirm = window.confirm("Logged out?");
+                if (confirm) {
+                  handleLogout();
+                  localStorage.removeItem("token");
+                  navigate("/login");
+                }
+              }} className="flex items-center gap-2 text-white hover:underline">
+                <AiOutlineLogout size={24} /> Logout
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </header>
+
+      {/* Main Content */}
+      <div className="flex-grow flex items-center justify-center py-10">
+        <div className="bg-[#F8F8F8] p-8 rounded-lg shadow-lg w-full max-w-md">
+          <h2 className="text-2xl font-bold text-center text-[#1A1A1A] mb-6">
+            Share Here..!
+          </h2>
+
+          {/* Server Error Messages */}
+          {serverError && (
+            <ul className="mb-4 text-[#E07A5F] text-sm">
+              {Array.isArray(serverError) ? (
+                serverError.map((ele, index) => <li key={index}>{ele}</li>)
+              ) : (
+                <li>{serverError}</li>
+              )}
+            </ul>
           )}
-        </ul>
-      )}
-      <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded-lg w-96">
-        <input
-          type="text"
-          value={form.title}
-          onChange={(e) => setForm({ ...form, title: e.target.value })}
-          placeholder="Enter the Title.."
-          className="w-full p-2 border border-gray-300 rounded mb-2"
-        />
-        {clientError.title && <p className="text-red-500 text-sm">{clientError.title}</p>}
 
-        <div className="mb-2">
-          <label className="block text-gray-700">Is Selling?</label>
-          <div className="flex gap-4">
-            <label className="flex items-center gap-2">
+          {/* Upload Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Title Field */}
+            <div>
               <input
-                type="radio"
-                name="isSelling"
-                value="true"
-                checked={form.isSelling === true}
-                onChange={() => setForm({ ...form, isSelling: true })}
+                type="text"
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                placeholder="Enter the Title.."
+                className="w-full px-4 py-2 border border-[#3D405B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E07A5F]"
               />
-              Yes
-            </label>
-            <label className="flex items-center gap-2">
+              {clientError.title && (
+                <p className="text-[#E07A5F] text-sm mt-1">{clientError.title}</p>
+              )}
+            </div>
+
+            {/* Is Selling Field */}
+            <div>
+              <label className="block text-[#1A1A1A] mb-2">Is Selling?</label>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="isSelling"
+                    value="true"
+                    checked={form.isSelling === true}
+                    onChange={() => setForm({ ...form, isSelling: true })}
+                  />
+                  Yes
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="isSelling"
+                    value="false"
+                    checked={form.isSelling === false}
+                    onChange={() => setForm({ ...form, isSelling: false })}
+                  />
+                  No
+                </label>
+              </div>
+            </div>
+
+            {/* Condition Field */}
+            <div>
+              <label className="block text-[#1A1A1A] mb-2">Condition</label>
+              <select
+                value={form.condition}
+                onChange={(e) => setForm({ ...form, condition: e.target.value })}
+                className="w-full px-4 py-2 border border-[#3D405B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E07A5F]"
+              >
+                <option value="" disabled>Select</option>
+                <option value="fair">Fair</option>
+                <option value="new">New</option>
+                <option value="good">Good</option>
+              </select>
+              {clientError.condition && (
+                <p className="text-[#E07A5F] text-sm mt-1">{clientError.condition}</p>
+              )}
+            </div>
+
+            {/* Rent Price Field */}
+            <div>
               <input
-                type="radio"
-                name="isSelling"
-                value="false"
-                checked={form.isSelling === false}
-                onChange={() => setForm({ ...form, isSelling: false })}
+                type="number"
+                value={form.rentPrice}
+                onChange={(e) => setForm({ ...form, rentPrice: e.target.value })}
+                placeholder="Enter the Rent Price"
+                className="w-full px-4 py-2 border border-[#3D405B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E07A5F]"
               />
-              No
-            </label>
-          </div>
+              {clientError.rentPrice && (
+                <p className="text-[#E07A5F] text-sm mt-1">{clientError.rentPrice}</p>
+              )}
+            </div>
+
+            {/* Sell Price Field (Conditional) */}
+            {form.isSelling && (
+              <div>
+                <input
+                  type="number"
+                  value={form.sellPrice}
+                  onChange={(e) => setForm({ ...form, sellPrice: e.target.value })}
+                  placeholder="Enter the Sell Price"
+                  className="w-full px-4 py-2 border border-[#3D405B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E07A5F]"
+                />
+                {clientError.sellPrice && (
+                  <p className="text-[#E07A5F] text-sm mt-1">{clientError.sellPrice}</p>
+                )}
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="w-full bg-[#3D405B] text-white py-2 rounded-lg hover:bg-[#2C3E50] transition-colors"
+            >
+              {editId ? "Update" : "Create"}
+            </button>
+          </form>
         </div>
+      </div>
 
-        <label className="block text-gray-700">Condition</label>
-        <select
-          value={form.condition}
-          onChange={(e) => setForm({ ...form, condition: e.target.value })}
-          className="w-full p-2 border border-gray-300 rounded mb-2"
-        >
-          <option value="" disabled>Select</option>
-          <option value="fair">Fair</option>
-          <option value="new">New</option>
-          <option value="good">Good</option>
-        </select>
-        {clientError.condition && <p className="text-red-500 text-sm">{clientError.condition}</p>}
-
-        <input
-          type="number"
-          value={form.rentPrice}
-          onChange={(e) => setForm({ ...form, rentPrice: e.target.value })}
-          placeholder="Enter the Rent Price"
-          className="w-full p-2 border border-gray-300 rounded mb-2"
-        />
-        {clientError.rentPrice && <p className="text-red-500 text-sm">{clientError.rentPrice}</p>}
-
-        {form.isSelling && (
-          <>
-            <input
-              type="number"
-              value={form.sellPrice}
-              onChange={(e) => setForm({ ...form, sellPrice: e.target.value })}
-              placeholder="Enter the Sell Price"
-              className="w-full p-2 border border-gray-300 rounded mb-2"
-            />
-            {clientError.sellPrice && <p className="text-red-500 text-sm">{clientError.sellPrice}</p>}
-          </>
-        )}
-
-        <button
-          type="submit"
-          className="w-full bg-orange-500 text-white p-2 rounded mt-4 hover:bg-orange-600 transition"
-        >
-          {editId ? "Update" : "Create"}
-        </button>
-      </form>
+      {/* Footer */}
+      <footer className="w-full bg-[#2C3E50] text-white p-4 text-center">
+        <p>&copy; 2025 Bookmate. All rights reserved.</p>
+      </footer>
     </div>
   );
 }

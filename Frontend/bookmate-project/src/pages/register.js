@@ -1,149 +1,3 @@
-// import { useNavigate } from 'react-router-dom'
-// import axios from '../config/axios'
-// import { useEffect, useState } from "react"
-// export default function Register(){
-//     const navigate=useNavigate()
-//     const formInitialValue={
-//         name:"",
-//         email:"",
-//         password:"",
-//         phone:"",
-//         role:"",
-//         location:{
-//             city:"",
-//             state:""
-//         }
-//     }
-//     const[count,setCount]=useState(0)
-//     const [form,setForm]=useState(formInitialValue)
-//     const [clientError,setClientError]=useState({})
-//     const [serverError,setServerError]=useState([])
-//     const errors={}
-//     const runClientValidation=()=>{
-//         if(form.name.trim().length==0){
-//             errors.name='*name is required'
-//         }
-//         if(form.email.trim().length==0){
-//             errors.email='*email is required'
-//         }
-//         if(form.password.trim().length==0){
-//             errors.password='*password is required'
-//         }
-//         if(form.phone.trim().length==0){
-//             errors.phone='*phone number is required'
-//         }
-//         if(form.location.state.trim().length==0){
-//             errors.state="*state is required"
-//         }
-//         if(form.location.city.trim().length==0){
-//             errors.city="*city is required"
-//         }
-//     }
-//     useEffect(()=>{
-//         (async()=>{
-//             try{
-//                 const response=await axios.get('/api/user/count')
-//                 console.log('count',response.data.count)
-//                 setCount(response.data.count)
-//             }catch(err){
-//                 console.log(err)
-//             }
-//         })()
-//     },[])
-//     const handleSubmit=async(e)=>{
-//         e.preventDefault()
-//         runClientValidation()
-//         if(Object.keys(errors).length==0){
-//             try{
-//                 const responses=await axios.post('/api/user/register',form)
-//                 console.log('registered user',responses.data)
-//                 setForm(formInitialValue)
-//                 navigate('/login')
-//             }catch(err){
-//                 console.log(err.response.data.errors)
-//                 setServerError(err.response.data.errors)
-    
-//             }
-//         }else{
-//             setClientError(errors)
-//         }
-        
-
-//     }
-   
-
-//     return (
-//         <div>
-//             <h2>Register Here..!</h2>
-//             <ul>{serverError&&serverError.map(ele=><li style={{color:"red",fontSize:"15px"}}><i>{ele.msg}</i></li>)}</ul>
-//             <form onSubmit={handleSubmit}>
-//                 <input type="text"
-//                 value={form.name}
-//                 onChange={(e)=>setForm({...form,name:e.target.value})}
-//                 placeholder="Enter your name"/> <br/>
-//                 {clientError.name&&<i style={{color:"red",fontSize:'13px'}}>{clientError.name}</i>}<br/>
-
-//                 <input type="email"
-//                 value={form.email}
-//                 onChange={(e)=>setForm({...form,email:e.target.value})}
-//                 placeholder="Enter your email"/><br/>
-//                 {clientError.email&&<i style={{color:"red",fontSize:'13px'}}>{clientError.email}</i>}<br/>
-
-               
-
-//                 <input type="password"
-//                 value={form.password}
-//                 onChange={(e)=>{setForm({...form,password:e.target.value})}}
-//                 placeholder="Enter your password"/><br/>
-//                 {clientError.password&&<i style={{color:"red",fontSize:'13px'}}>{clientError.password}</i>}<br/>
-//                 {count>0&&(
-//                      <>
-//                      <input type="text"
-//                      value={form.phone}
-//                      onChange={(e)=>setForm({...form,phone:e.target.value})}
-//                      placeholder="Enter your phone Number"/><br/>
-//                      {clientError.phone&&<i  style={{color:"red",fontSize:'13px'}}>{clientError.phone}</i>}<br/>
-                     
-//                     <input
-//                     type="text"
-//                     value={form.location.city}
-//                     onChange={(e) => setForm({ ...form, location: { ...form.location, city: e.target.value } })}
-//                     placeholder="Enter your city"/><br/>
-//                     {clientError.city&&<i  style={{color:"red",fontSize:'13px'}}>{clientError.city}</i>}
-//                 <br/>
-               
-//                 <input
-//                     type="text"
-//                     value={form.location.state}
-//                     onChange={(e) => setForm({ ...form, location: { ...form.location, state: e.target.value } })}
-//                     placeholder="Enter your state"
-//                 /><br/>
-//                 {clientError.state&&<i  style={{color:"red",fontSize:'13px'}}>{clientError.state}</i>}<br/>
-                
-            
-
-//             <label> I'm a vendor</label>
-//             <input type='radio'
-//             value="vendor"
-//             onChange={(e)=>setForm({...form,role:e.target.value})}
-//             name="role"/>
-
-//             <label>I'm a Client</label>
-//             <input type='radio'
-//             value="client"
-//             onChange={(e)=>setForm({...form,role:e.target.value})}
-//             name="role"/>
-//             <br/>
-//                      </>
-
-//                 )}
-                    
-//                 <input type="Submit"
-//                 value="Register"/>
-//             </form>
-//         </div>
-//     )
-// }
 import { Link, useNavigate } from "react-router-dom";
 import axios from "../config/axios";
 import { useEffect, useState } from "react";
@@ -220,22 +74,27 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100">
+    <div className="min-h-screen flex flex-col bg-[#F4F1DE]">
       {/* Header */}
-      <header className="w-full h-8 bg-red-700 text-white p-4 flex justify-between items-center px-6 left-0 top-0">
+      <header className="w-full h-16 bg-[#2C3E50] text-white p-4 flex justify-between items-center px-6 left-0 top-0 shadow-md">
         <h1 className="text-2xl font-bold">Bookmate</h1>
-        <Link to='/login'>Login</Link>
+        <Link
+          to="/login"
+          className="text-white hover:underline"
+        >
+          Login
+        </Link>
       </header>
 
       {/* Registration Form */}
       <div className="flex-grow flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-          <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
+        <div className="bg-[#F8F8F8] p-8 rounded-lg shadow-lg w-full max-w-md">
+          <h2 className="text-2xl font-bold text-center text-[#1A1A1A] mb-6">
             Register
           </h2>
 
           {serverError.length > 0 && (
-            <ul className="mb-4 text-red-500 text-sm">
+            <ul className="mb-4 text-[#E07A5F] text-sm">
               {serverError.map((ele, index) => (
                 <li key={index}>{ele.msg}</li>
               ))}
@@ -243,64 +102,70 @@ export default function Register() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Name Field */}
             <div>
               <input
                 type="text"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="Enter your name"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-2 border border-[#3D405B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E07A5F]"
               />
               {clientError.name && (
-                <p className="text-red-500 text-sm mt-1">{clientError.name}</p>
+                <p className="text-[#E07A5F] text-sm mt-1">{clientError.name}</p>
               )}
             </div>
 
+            {/* Email Field */}
             <div>
               <input
                 type="email"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 placeholder="Enter your email"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-2 border border-[#3D405B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E07A5F]"
               />
               {clientError.email && (
-                <p className="text-red-500 text-sm mt-1">{clientError.email}</p>
+                <p className="text-[#E07A5F] text-sm mt-1">{clientError.email}</p>
               )}
             </div>
 
+            {/* Password Field */}
             <div>
               <input
                 type="password"
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 placeholder="Enter your password"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-2 border border-[#3D405B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E07A5F]"
               />
               {clientError.password && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-[#E07A5F] text-sm mt-1">
                   {clientError.password}
                 </p>
               )}
             </div>
 
+            {/* Additional Fields for Existing Users */}
             {count > 0 && (
               <>
+                {/* Phone Field */}
                 <div>
                   <input
                     type="text"
                     value={form.phone}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
                     placeholder="Enter your phone number"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-4 py-2 border border-[#3D405B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E07A5F]"
                   />
                   {clientError.phone && (
-                    <p className="text-red-500 text-sm mt-1">
+                    <p className="text-[#E07A5F] text-sm mt-1">
                       {clientError.phone}
                     </p>
                   )}
                 </div>
 
+                {/* City Field */}
                 <div>
                   <input
                     type="text"
@@ -312,15 +177,16 @@ export default function Register() {
                       })
                     }
                     placeholder="Enter your city"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-4 py-2 border border-[#3D405B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E07A5F]"
                   />
                   {clientError.city && (
-                    <p className="text-red-500 text-sm mt-1">
+                    <p className="text-[#E07A5F] text-sm mt-1">
                       {clientError.city}
                     </p>
                   )}
                 </div>
 
+                {/* State Field */}
                 <div>
                   <input
                     type="text"
@@ -332,10 +198,10 @@ export default function Register() {
                       })
                     }
                     placeholder="Enter your state"
-                    className="w-full px-4 py-2 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-4 py-2 border border-[#3D405B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E07A5F]"
                   />
                   {clientError.state && (
-                    <p className="text-red-500 text-sm mt-1">
+                    <p className="text-[#E07A5F] text-sm mt-1">
                       {clientError.state}
                     </p>
                   )}
@@ -372,18 +238,21 @@ export default function Register() {
               </>
             )}
 
+            {/* Register Button */}
             <button
               type="submit"
-              className="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition-colors"
+              className="w-full bg-[#3D405B] text-white py-2 rounded-lg hover:bg-[#2C3E50] transition-colors"
             >
               Register
             </button>
           </form>
         </div>
       </div>
-      <footer className="w-full bg-gray-800 text-white p-4 text-center">
-  <p>&copy; 2025 Bookmate. All rights reserved.</p>
-</footer>
+
+      {/* Footer */}
+      <footer className="w-full bg-[#2C3E50] text-white p-4 text-center">
+        <p>&copy; 2025 Bookmate. All rights reserved.</p>
+      </footer>
     </div>
   );
 }

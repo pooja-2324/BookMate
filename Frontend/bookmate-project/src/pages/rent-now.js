@@ -11,7 +11,7 @@
 //     const dispatch=useDispatch()
 //     const navigate=useNavigate()
 //     const {bookData}=useSelector(state=>state.books)
-//     const {rentData}=useSelector(state=>state.rents)
+//     const {all}=useSelector(state=>state.rents)
 //     const {serverError}=useSelector(state=>state.carts)
 //     const {bid}=useParams()
 //     useEffect(()=>{
@@ -23,7 +23,7 @@
 //     console.log('bid',bid)
     
 
-//     const rent=Array.isArray(rentData)?rentData?.find(ele=>ele.book==bid):null
+//     const rent=Array.isArray(all)?all?.find(ele=>ele.book==bid):null
 //     // const handleCart=async ()=>{
 //     //     try {
 //     //         const response = await dispatch(addToCart(bid)).unwrap();
@@ -91,95 +91,149 @@ import { addToCart } from "../slices/cartSlice";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { AiOutlineUser,AiOutlineShoppingCart } from "react-icons/ai";
+import { AiOutlineUser, AiOutlineShoppingCart } from "react-icons/ai";
 import AuthContext from "../context/authContext";
 
 export default function RentNow() {
-    const {handleLogout} = useContext(AuthContext);
-    const [errorMessage, setErrorMessage] = useState(null);
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const { bookData } = useSelector((state) => state.books);
-    const { rentData } = useSelector((state) => state.rents);
-    const { serverError } = useSelector((state) => state.carts);
-    const { bid } = useParams();
+  const { handleLogout } = useContext(AuthContext);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { bookData } = useSelector((state) => state.books);
+  const { all } = useSelector((state) => state.rents);
+  const { serverError } = useSelector((state) => state.carts);
+  const { bid } = useParams();
+  console.log("bid", bid);
 
-    useEffect(() => {
-        dispatch(fetchRentDetails(bid));
-        dispatch(verifiedBooks());
-    }, [dispatch, bid]);
+  useEffect(() => {
+    dispatch(verifiedBooks());
+    dispatch(fetchRentDetails({ bid }));
+  }, [dispatch, bid]);
 
-    const book = bookData?.find((ele) => ele._id === bid);
-    const rent = Array.isArray(rentData) ? rentData?.find((ele) => ele.book === bid) : null;
+  console.log("rent details", all);
+  const book = bookData?.find((ele) => ele._id === bid);
+  console.log("book", book);
+  const rent = Array.isArray(all) ? all?.find((ele) => ele.book === bid) : null;
 
-    const handleCart = async (bid, action) => {
-        try {
-            await dispatch(addToCart({ bid, action })); // action can be "buy" or "rent"
-            alert(`Added to cart for ${action}`);
-            navigate("/cart");
-        } catch (error) {
-            console.error("Error adding to cart:", error);
-            setErrorMessage(error?.error || "Something went wrong");
-        }
-    };
+  const handleCart = async (bid, action) => {
+    try {
+      dispatch(addToCart({ bid, action })); // action can be "buy" or "rent"
+      alert(`Added to cart for ${action}`);
+      navigate("/cart");
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      setErrorMessage(error?.error || "Something went wrong");
+    }
+  };
 
-    const handleRent = (id) => {
-        navigate(`/book/${id}/orderplacing`);
-    };
+  
 
-    return (
-        <div className="min-h-screen bg-black-100" >
-            <header className="w-full h-8 bg-red-700 text-white p-4 flex justify-between items-center px-6 left-0 top-0">
-                <h1 className="text-2xl font-bold">Bookmate</h1>
-                <div className="ml-auto flex gap-4">
-                    <Link to="/profile" className="flex items-center gap-2 text-white hover:underline">
-                        <AiOutlineUser size={24} /> Profile
-                    </Link>
-                    <Link to="/cart" className="flex items-center gap-2 text-white hover:underline">
-                        <AiOutlineShoppingCart size={24} /> Cart
-                    </Link>
-                    <li>
-                        <button onClick={() => {
-                            const confirm = window.confirm('Logged out?');
-                            if (confirm) {
-                                handleLogout();
-                                localStorage.removeItem('token');
-                                navigate('/login');
-                            }
-                        }}>Logout</button>
-                    </li>
-                </div>
-            </header>
-            <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
-                <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Rent Details</h2>
-                <div className="flex flex-col md:flex-row gap-8">
-                    <div className="flex-shrink-0">
-                        <img src={book?.coverImage} alt={book?.modifiedTitle} className="w-48 h-64 object-cover rounded-lg shadow-md" />
-                    </div>
-                    <div className="flex-grow">
-                        <h3 className="text-xl font-semibold text-gray-800 mb-4">{book?.modifiedTitle}</h3>
-                        <div className="space-y-3">
-                            <p className="text-gray-700"><span className="font-semibold">Rent Duration:</span> {rent?.period}</p>
-                            <p className="text-gray-700"><span className="font-semibold">Caution Deposit:</span> ₹{rent?.pricing?.cautionDeposit}</p>
-                            <p className="text-gray-700"><span className="font-semibold">Delivery Charge:</span> ₹{rent?.pricing?.deliveryFee}</p>
-                            <p className="text-gray-700"><span className="font-semibold">Reading Fee:</span> ₹{rent?.pricing?.readingFee}</p>
-                            <p className="text-gray-700"><span className="font-semibold">Platform Fee:</span> ₹{rent?.pricing?.platformFee}</p>
-                            <h4 className="text-lg font-bold text-gray-800">
-                                <span className="font-semibold">Total:</span> ₹
-                                {rent?.pricing?.cautionDeposit + rent?.pricing?.deliveryFee + rent?.pricing?.readingFee + rent?.pricing?.platformFee}
-                            </h4>
-                        </div>
-                        <p className="mt-6 text-sm text-gray-600 bg-yellow-50 p-4 rounded-lg">
-                            <span className="font-semibold">Note:</span> Caution Deposit is refundable after you return the book within the duration of {rent?.period}. If you make a delay in returning or cause any damage to the book, a late fee or damage fee will be deducted from the caution deposit.
-                        </p>
-                        <div className="mt-6 flex gap-4">
-                            <button onClick={() => handleRent(book._id)} className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors">Rent Now</button>
-                            <button onClick={() => handleCart(book._id, "rent")} className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-colors">Add To Cart</button>
-                        </div>
-                    </div>
-                </div>
-                {errorMessage && <p className="mt-6 text-red-500 text-center">{errorMessage}</p>}
-            </div>
+  return (
+    <div className="min-h-screen bg-[#F4F1DE]">
+      {/* Header */}
+      <header className="w-full h-16 bg-[#2C3E50] text-white p-4 flex justify-between items-center px-6 left-0 top-0 shadow-md">
+        <h1 className="text-2xl font-bold">Bookmate</h1>
+        <div className="ml-auto flex gap-4">
+          <Link to="/profile" className="flex items-center gap-2 text-white hover:underline">
+            <AiOutlineUser size={24} /> Profile
+          </Link>
+          <Link to="/cart" className="flex items-center gap-2 text-white hover:underline">
+            <AiOutlineShoppingCart size={24} /> Cart
+          </Link>
+          <li>
+            <button
+              onClick={() => {
+                const confirm = window.confirm("Logged out?");
+                if (confirm) {
+                  handleLogout();
+                  localStorage.removeItem("token");
+                  navigate("/login");
+                }
+              }}
+              className="text-white hover:underline"
+            >
+              Logout
+            </button>
+          </li>
         </div>
-    );
+      </header>
+
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto bg-[#F8F8F8] p-8 rounded-lg shadow-lg mt-6">
+        <h2 className="text-2xl font-bold text-center text-[#1A1A1A] mb-6">
+          Rent Details
+        </h2>
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Book Image */}
+          <div className="flex-shrink-0">
+            <img
+              src={book?.coverImage}
+              alt={book?.modifiedTitle}
+              className="w-48 h-64 object-cover rounded-lg shadow-md"
+            />
+          </div>
+
+          {/* Rent Details */}
+          <div className="flex-grow">
+            <h3 className="text-xl font-semibold text-[#1A1A1A] mb-4">
+              {book?.modifiedTitle}
+            </h3>
+            <div className="space-y-3">
+              <p className="text-[#3D405B]">
+                <span className="font-semibold">Rent Duration:</span> {rent?.period}
+              </p>
+              <p className="text-[#3D405B]">
+                <span className="font-semibold">Caution Deposit:</span> ₹
+                {rent?.pricing?.cautionDeposit}
+              </p>
+              <p className="text-[#3D405B]">
+                <span className="font-semibold">Delivery Charge:</span> ₹
+                {rent?.pricing?.deliveryFee}
+              </p>
+              <p className="text-[#3D405B]">
+                <span className="font-semibold">Reading Fee:</span> ₹
+                {rent?.pricing?.readingFee}
+              </p>
+              <p className="text-[#3D405B]">
+                <span className="font-semibold">Platform Fee:</span> ₹
+                {rent?.pricing?.platformFee}
+              </p>
+              <h4 className="text-lg font-bold text-[#1A1A1A]">
+                <span className="font-semibold">Total:</span> ₹
+                {rent?.pricing?.cautionDeposit +
+                  rent?.pricing?.deliveryFee +
+                  rent?.pricing?.readingFee +
+                  rent?.pricing?.platformFee}
+              </h4>
+            </div>
+
+            {/* Note */}
+            <p className="mt-6 text-sm text-[#3D405B] bg-[#F4F1DE] p-4 rounded-lg">
+              <span className="font-semibold">Note:</span> Caution Deposit is
+              refundable after you return the book within the duration of{" "}
+              {rent?.period}. If you make a delay in returning or cause any damage
+              to the book, a late fee or damage fee will be deducted from the
+              caution deposit.
+            </p>
+
+            {/* Buttons */}
+            <div className="mt-6 flex gap-4">
+             
+              <button
+                onClick={() => handleCart(book._id, "rent")}
+                className="bg-[#3D405B] text-white px-6 py-2 rounded-lg hover:bg-[#3D405B] transition-colors"
+              >
+                Add To Cart
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Error Message */}
+        {errorMessage && (
+          <p className="mt-6 text-[#E07A5F] text-center">{errorMessage}</p>
+        )}
+      </div>
+    </div>
+  );
 }

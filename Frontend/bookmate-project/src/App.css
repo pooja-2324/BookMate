@@ -143,11 +143,11 @@ h1 {
 }
 
 .links a:hover {
-  color: red; /* Soft Orange on hover */
+  color: #2C3E50; /* Soft Orange on hover */
 }
 
 button {
-  background-color: red; /* Soft Orange for buttons */
+  background-color: #2C3E50; /* Soft Orange for buttons */
   color: white;
   border: none;
   padding: 10px 20px;
@@ -156,7 +156,7 @@ button {
 }
 
 button:hover {
-  background-color: red; /* Darker Orange on hover */
+  background-color: #2C3E50; /* Darker Orange on hover */
 }
 
 .book-card {
@@ -191,7 +191,7 @@ button:hover {
 }
 
 .book-card button {
-  background-color: #E67E22; /* Soft Orange for buttons */
+  background-color: #2C3E50; /* Soft Orange for buttons */
   color: white;
   border: none;
   padding: 8px 16px;
@@ -201,7 +201,7 @@ button:hover {
 }
 
 .book-card button:hover {
-  background-color: #D35400; /* Darker Orange on hover */
+  background-color: #2C3E50; /* Darker Orange on hover */
 }
 
 .pagination {
@@ -241,7 +241,7 @@ button:hover {
 
 .search-bar:focus {
   outline: none;
-  border-color: #E67E22; /* Soft Orange on focus */
+  border-color: #2C3E50; /* Soft Orange on focus */
 }
  */ */
 /* Header Styles */
@@ -290,7 +290,7 @@ button:hover {
 }
 
 .cart-count {
-  background-color: #E67E22; /* Soft Orange */
+  background-color: #2C3E50; /* Soft Orange */
   color: white;
   font-size: 12px;
   padding: 2px 6px;
@@ -301,7 +301,7 @@ button:hover {
 }
 
 .logout-button {
-  background-color: #E67E22; /* Soft Orange */
+  background-color: #2C3E50; /* Soft Orange */
   color: white;
   border: none;
   padding: 8px 16px;
@@ -311,7 +311,7 @@ button:hover {
 }
 
 .logout-button:hover {
-  background-color: #D35400; /* Darker Orange on hover */
+  background-color:#2C3E50; /* Darker Orange on hover */
 }
 
 /* Home Styles */

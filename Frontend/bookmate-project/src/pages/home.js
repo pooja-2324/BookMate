@@ -77,9 +77,9 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-300">
+    <div className="min-h-screen flex flex-col bg-[#F4F1DE]">
       {/* Header */}
-      <header className="w-full h-8 bg-red-700 text-white p-4 flex justify-between items-center px-6 left-0 top-0">
+      <header className="w-full h-16 bg-[#2C3E50] text-white p-4 flex justify-between items-center px-6 left-0 top-0 shadow-md">
         <h1 className="text-2xl font-bold">Bookmate</h1>
         <div className="ml-auto flex gap-4">
           <Link to="/profile" className="flex items-center gap-2 text-white hover:underline">
@@ -109,12 +109,12 @@ export default function Home() {
       {/* Main Content */}
       <div className="flex flex-1">
         {/* Filter Bar */}
-        <div className="w-64 bg-grey-800 p-4 shadow-md">
-          <h2 className="text-lg font-semibold mb-4 ">Filters</h2>
+        <div className="w-64 bg-[#3D405B] p-4 shadow-md">
+          <h2 className="text-lg font-semibold mb-4 text-white">Filters</h2>
           <div className="space-y-4">
             {/* Sell Books Filter */}
             <div>
-              <label className="flex items-center">
+              <label className="flex items-center text-white">
                 <input
                   type="checkbox"
                   checked={filters.sellBooks}
@@ -127,7 +127,7 @@ export default function Home() {
 
             {/* Rent Books Filter */}
             <div>
-              <label className="flex items-center">
+              <label className="flex items-center text-white">
                 <input
                   type="checkbox"
                   checked={filters.rentBooks}
@@ -140,9 +140,9 @@ export default function Home() {
 
             {/* Category Filters */}
             <div>
-              <h3 className="font-semibold mb-2">Categories</h3>
-              {["Juvenile Fiction", "Science", "Fiction","Business & Economics"].map((category) => (
-                <label key={category} className="flex items-center">
+              <h3 className="font-semibold mb-2 text-white">Categories</h3>
+              {["Juvenile Fiction", "Science", "Fiction", "Business & Economics"].map((category) => (
+                <label key={category} className="flex items-center text-white">
                   <input
                     type="checkbox"
                     checked={filters.categories.includes(category)}
@@ -159,20 +159,20 @@ export default function Home() {
         {/* Content Area */}
         <div className="flex-1">
           {/* Sorting Dropdown */}
-          <div className="bg-white p-4 shadow-md flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-gray-800">Books</h2>
+          <div className="bg-[#F8F8F8] p-4 shadow-md flex justify-between items-center">
+            <h2 className="text-xl font-semibold text-[#1A1A1A]">Books</h2>
             <div className="relative w-full max-w-md">
-              <AiOutlineSearch size={24} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 transition-colors duration-200" />
+              <AiOutlineSearch size={24} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#3D405B] transition-colors duration-200" />
               <input
                 type="text"
                 placeholder="Search by title, author, or genre..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400"
+                className="w-full pl-10 pr-4 py-2 border border-[#3D405B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#E07A5F] focus:border-[#E07A5F] transition-all duration-200 hover:border-[#2C3E50]"
               />
             </div>
             <select
-              className="border border-gray-300 rounded-md px-3 py-2"
+              className="border border-[#3D405B] rounded-md px-3 py-2 text-[#1A1A1A]"
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
             >
@@ -189,30 +189,30 @@ export default function Home() {
               currentBooks.map((ele) => (
                 <div
                   key={ele._id}
-                  className="book-card w-40 h-100 text-center shadow-xl rounded-lg p-4 bg-white-500 flex flex-col relative group"
+                  className="book-card w-48 h-100 text-center shadow-xl rounded-lg p-4 bg-white flex flex-col relative group hover:shadow-2xl transition-shadow duration-200"
                 >
                   {/* Book Image */}
-                  <div onClick={() => handleImageClick(ele._id)} className="cursor-pointer w-1000 h-30">
-                    <img src={ele.coverImage} alt="Book Cover" className="w-1000 h-20 object-cover rounded-t-lg" />
+                  <div onClick={() => handleImageClick(ele._id)} className="cursor-pointer w-full h-48">
+                    <img src={ele.coverImage} alt="Book Cover" className="w-full h-full object-cover rounded-t-lg" />
                   </div>
 
                   {/* Title & Rating */}
-                  <h3 className="text-lg font-semibold mt-2 truncate text-gray-800">{ele.modifiedTitle}</h3>
+                  <h3 className="text-lg font-semibold mt-2 truncate text-[#1A1A1A]">{ele.modifiedTitle}</h3>
                   <Rating value={ele.totalRating} itemShapes={ThinStar} readOnly style={{ maxWidth: 100, margin: "auto" }} />
-                  <i className="text-sm text-gray-700">{ele.status}</i>
+                  <i className="text-sm text-[#3D405B]">{ele.status}</i>
 
                   {/* Hover Effect */}
                   {ele.status === "available" && (
-                    <div className="absolute inset-0 bg-gray-800 bg-opacity-80 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg p-4">
+                    <div className="absolute inset-0 bg-[#2C3E50] bg-opacity-90 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg p-4">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleShop(ele._id);
                         }}
-                        className="mt-3 bg-white text-black px-4 py-2 rounded-md hover:bg-gray-200 transition-colors font-semibold"
+                        className="mt-3 bg-[#E07A5F] text-white px-4 py-2 rounded-md hover:bg-[#D56A4F] transition-colors font-semibold"
                       >
-                        <p className="text-black text-sm font-bold">Rent at ₹{ele.rentPrice}/-</p>
-                        {ele.isSelling && <p className="text-black text-sm font-bold">Buy at ₹{ele.sellPrice}/-</p>}
+                        <p className="text-white text-sm font-bold">Rent at ₹{ele.rentPrice}/-</p>
+                        {ele.isSelling && <p className="text-white text-sm font-bold">Buy at ₹{ele.sellPrice}/-</p>}
                         Shop Now
                       </button>
                     </div>
@@ -220,22 +220,22 @@ export default function Home() {
                 </div>
               ))
             ) : (
-              <p className="text-gray-700 text-lg">No books found</p>
+              <p className="text-[#3D405B] text-lg">No books found</p>
             )}
           </div>
 
           {/* Pagination */}
-          <div className="pagination flex justify-center gap-4 mt-4">
+          <div className="pagination flex justify-center gap-4 mt-4 mb-6">
             {currentPage > 1 && (
-              <button onClick={() => setCurrentPage(currentPage - 1)} className="px-3 py-2 bg-gray-300 rounded hover:bg-gray-400">
+              <button onClick={() => setCurrentPage(currentPage - 1)} className="px-3 py-2 bg-[#3D405B] text-white rounded hover:bg-[#2C3E50] transition-colors">
                 Previous
               </button>
             )}
-            <span className="text-lg font-semibold">
+            <span className="text-lg font-semibold text-[#1A1A1A]">
               Page {currentPage} of {totalPages}
             </span>
             {currentPage < totalPages && (
-              <button onClick={() => setCurrentPage(currentPage + 1)} className="px-3 py-2 bg-gray-300 rounded hover:bg-gray-400">
+              <button onClick={() => setCurrentPage(currentPage + 1)} className="px-3 py-2 bg-[#3D405B] text-white rounded hover:bg-[#2C3E50] transition-colors">
                 Next
               </button>
             )}
@@ -245,72 +245,3 @@ export default function Home() {
     </div>
   );
 }
-// import { useSelector, useDispatch } from "react-redux";
-// import {  verifiedBooks } from "../slices/bookSlice";
-// import { useEffect, useState } from "react";
-// import { useNavigate } from "react-router-dom";
-// import { Rating, ThinStar } from "@smastrom/react-rating";
-// import "@smastrom/react-rating/style.css";
-
-// export default function MyBooks() {
-//   const dispatch = useDispatch();
-//   const navigate = useNavigate();
-//   const { bookData } = useSelector((state) => state.books);
-//   const [currentPage, setCurrentPage] = useState(1);
-
-//   useEffect(() => {
-//     dispatch(verifiedBooks());
-//   }, [dispatch]);
-
-//   const booksPerPage = 4;
-//   const lastBookIndex = currentPage * booksPerPage;
-//   const firstBookIndex = lastBookIndex - booksPerPage;
-//   const currentBooks = bookData?.slice(firstBookIndex, lastBookIndex);
-//   const totalPages = Math.ceil(bookData.length / booksPerPage);
-
-//   const handleImageClick = (id) => navigate(`/review/${id}`);
-
-//   return (
-//     <div className="min-h-screen flex flex-col bg-gray-100">
-//       <header className="w-full bg-orange-500 text-white p-4 flex justify-center">
-//         <h1 className="text-2xl font-bold">My Books</h1>
-//       </header>
-
-//       <div className="flex flex-wrap gap-4 justify-center p-4">
-//         {currentBooks.length > 0 ? (
-//           currentBooks.map((ele) => (
-//             <div
-//               key={ele._id}
-//               className="book-card w-40 h-100 text-center shadow-lg rounded-lg p-4 bg-white flex flex-col relative group"
-//             >
-//               <div onClick={() => handleImageClick(ele._id)} className="cursor-pointer w-30 h-30">
-//                 <img src={ele.coverImage} alt="Book Cover" className="w-70 h-20 object-cover rounded-t-lg" />
-//               </div>
-//               <h3 className="text-lg font-semibold mb-1 truncate">{ele.modifiedTitle}</h3>
-//               <Rating value={ele.totalRating} itemShapes={ThinStar} readOnly style={{ maxWidth: 100, marginLeft: 30 }} />
-//               <i className="text-sm text-gray-600">{ele.status}</i>
-//             </div>
-//           ))
-//         ) : (
-//           <p>No books found</p>
-//         )}
-//       </div>
-
-//       <div className="pagination flex justify-center gap-4 mt-4">
-//         {currentPage > 1 && (
-//           <button onClick={() => setCurrentPage(currentPage - 1)} className="px-3 py-2 bg-gray-300 rounded hover:bg-gray-400">
-//             Previous
-//           </button>
-//         )}
-//         <span className="text-lg font-semibold">
-//           Page {currentPage} of {totalPages}
-//         </span>
-//         {currentPage < totalPages && (
-//           <button onClick={() => setCurrentPage(currentPage + 1)} className="px-3 py-2 bg-gray-300 rounded hover:bg-gray-400">
-//             Next
-//           </button>
-//         )}
-//       </div>
-//     </div>
-//   );
-// }

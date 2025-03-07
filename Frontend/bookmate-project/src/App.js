@@ -34,6 +34,7 @@ import AdminDashBoard from './pages/a-dashboard';
 import Vendors from './pages/a-vendors';
 import AdminBooks from './pages/a-books'
 import Clients from './pages/a-clients';
+import BookDetails from './pages/v-bookDetails';
 
 import Payment from './pages/payment';
 
@@ -67,7 +68,7 @@ function App() {
       </ul>
       
       <Routes>
-        <Route path='/' element={<PrivateRoute permittedRole={['client']}><Home /></PrivateRoute>} />
+        <Route path='/home' element={<PrivateRoute permittedRole={['client']}><Home /></PrivateRoute>} />
         <Route path='/login' element={<Login/>}/>
         <Route path='/register' element={<Register/>}/>
         <Route path="/vhome" element={<PrivateRoute permittedRole={['vendor']}><MyBooks/></PrivateRoute>}/>
@@ -100,6 +101,7 @@ function App() {
         <Route path='/admin-users' element={<PrivateRoute permittedRole={['admin']}><Vendors/></PrivateRoute>}/>
         <Route path='/admin-books' element={<PrivateRoute permitterRole={['admin']}><AdminBooks/></PrivateRoute>}/>
         <Route path='/admin-clients' element={<PrivateRoute permittedRole={['admin']}><Clients/></PrivateRoute>}/>
+        <Route path='/book-details/:bid' element={<PrivateRoute><BookDetails/></PrivateRoute>}/>
 
         
       </Routes>

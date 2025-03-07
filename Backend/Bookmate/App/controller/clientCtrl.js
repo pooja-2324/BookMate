@@ -92,21 +92,58 @@ clientCtrl.oneClient=async(req,res)=>{
         res.status(500).json({error:err})
     }
 }
-clientCtrl.bookClientRentDetails=async(req,res)=>{
-    try{
-        const clients=await Client.find().populate('rentedBooks.book rentedBooks.rent rentedBooks.rent.client')
-        if(!clients){
-            return res.status(404).json({error:'clients not found'})
-        }
-        const result=[]
-        clients.forEach(ele=>{
-            return result.push(ele.rentedBooks)
+// clientCtrl.bookClientRentDetails=async(req,res)=>{
+//     try{
+//         const clients=await Client.find().populate('rentedBooks.book rentedBooks.rent ').populate({
+//             path:'rentedBooks.rent',
+//             populate:{
+//                 path:'client'
+//             }
+//         })
+//         if(!clients){
+//             return res.status(404).json({error:'clients not found'})
+//         }
+//         const result=[]
+//         clients.forEach(ele=>{
+//             return result.push(ele.rentedBooks)
 
-        })
-        res.json(result)
-    }catch(err){
-        console.log(err)
-        res.status(500).json({error:'something went wrong'})
+//         })
+//         res.json(result)
+//     }catch(err){
+//         console.log(err)
+//         res.status(500).json({error:'something went wrong'})
+//     }
+// }
+clientCtrl.bookClientRentDetails = async (req, res) => {
+    try {
+      // Fetch clients with their rented books and rent details
+      const clients = await Client.find()
+        .populate("rentedBooks.book rentedBooks.rent")
+        .populate({
+          path: "rentedBooks.rent",
+          populate: {
+            path: "client",
+          },
+        });
+  
+      // If no clients are found, return a 404 error
+      if (!clients || clients.length === 0) {
+        return res.status(404).json({ error: "No clients found" });
+      }
+  
+      // Flatten the rentedBooks array from all clients into a single array
+      const result = clients.flatMap((client) => client.rentedBooks);
+  
+      // If no rented books are found, return a 404 error
+      if (result.length === 0) {
+        return res.status(404).json({ error: "No rented books found" });
+      }
+  
+      // Send the flattened array as the response
+      res.status(200).json(result);
+    } catch (err) {
+      console.error("Error fetching client rent details:", err);
+      res.status(500).json({ error: "Something went wrong" });
     }
-}
+  };
 export default clientCtrl

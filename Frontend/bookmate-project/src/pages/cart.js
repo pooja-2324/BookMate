@@ -1,92 +1,13 @@
-// import { useSelector, useDispatch } from "react-redux";
-// import { fetchCart,removeFromCart,clearCart } from "../slices/cartSlice";
-// import { useEffect } from "react";
-// import { useNavigate } from "react-router-dom";
-
-// export default function Cart() {
-//     const navigate=useNavigate()
-//     const dispatch = useDispatch();
-    
-    
-//     useEffect(()=>{
-//         dispatch(fetchCart())
-//     },[dispatch])
-//     const { cartData } = useSelector(state => state.carts);
-//     console.log('cartData',cartData)
-//     const handleRemove=(id)=>{
-//         const confirm=window.confirm('Are you sure ?')
-//         if(confirm){
-//             dispatch(removeFromCart(id))
-//         }
-//     }
-//     const handleClear=()=>{
-//         const confirm=window.confirm('Are you sure ?')
-//         if(confirm){
-//             dispatch(clearCart())
-//         }
-//     }
-//     const handleContinue=()=>{
-//         navigate('/order-placing')
-//     }
-//     return (
-//         <div>
-//             <h2>My Cart</h2>
-//             {cartData?.length === 0 ? (
-//                 <p>Your cart is empty</p>
-//             ) : (
-//                 <>
-//                     {cartData?.map(ele => (
-//                         <div key={ele.id}>
-//                             <img style={{
-//                 width: "160px",
-//                 textAlign: "center",
-//                 boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-//                 borderRadius: "8px",
-//                 padding: "10px",
-//                 backgroundColor: "#FEF3C7"
-//             }}
-//                             src={ele.book?.coverImage} alt={ele.title} />
-//                             <div>
-//                                 <h2>{ele.book?.modifiedTitle}</h2>
-//                                 <h3>Vendor: {ele.book?.vendor}</h3>
-//                                 <h3>Duration: {ele.rent?.period} days</h3>
-//                                 <h3>
-//                                     Amount to Pay: ₹
-//                                     {ele.rent?.pricing.cautionDeposit +
-//                                         ele.rent?.pricing.deliveryFee +
-//                                         ele.rent?.pricing.platformFee +
-//                                         ele.rent?.pricing.readingFee}
-//                                 </h3>
-//                                 <button onClick={() => handleRemove(ele._id)}>
-//                                     Remove
-//                                 </button>
-//                             </div>
-                          
-//                         </div>
-                        
-//                     ))}
-                
-//                 {cartData?.length > 0 ? (<>
-//                     <button onClick={handleClear}>Clear</button><br/>
-//                     <button onClick={handleContinue}>continue</button>
-//                 </>
-                       
-//                     ):<p>your cart is empty</p>}
-//                 </>
-//             )}
-//         </div>
-//     );
-// }
 import { useSelector, useDispatch } from "react-redux";
 import { fetchCart, removeFromCart, clearCart } from "../slices/cartSlice";
 import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { AiOutlineUser, AiOutlineShoppingCart, AiOutlineSearch } from "react-icons/ai";
+import { AiOutlineUser, AiOutlineShoppingCart } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import AuthContext from "../context/authContext";
 
 export default function Cart() {
-  const {handleLogout}=useContext(AuthContext)
+  const { handleLogout } = useContext(AuthContext);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -112,15 +33,16 @@ export default function Cart() {
   const handleRent = () => {
     navigate("/order-placing");
   };
-
   const handleBuy = () => {
     navigate("/order-placing");
   };
+ 
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-       <header className="w-full h-10 bg-red-700 text-white p-4 flex justify-between items-center px-6 left-0 top-0">
-        <h1 className="text-2xl font-bold text-white">Bookmate</h1>
+    <div className="min-h-screen bg-[#F4F1DE] p-6">
+      {/* Header */}
+      <header className="w-full h-16 bg-[#2C3E50] text-white p-4 flex justify-between items-center px-6 left-0 top-0 shadow-md">
+        <h1 className="text-2xl font-bold">Bookmate</h1>
         <div className="ml-auto flex gap-4">
           <Link to="/profile" className="flex items-center gap-2 text-white hover:underline">
             <AiOutlineUser size={24} /> Profile
@@ -145,20 +67,22 @@ export default function Cart() {
           </li>
         </div>
       </header>
-      <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-          My Cart({cartData?.length})
+
+      {/* Cart Content */}
+      <div className="max-w-4xl mx-auto bg-[#F8F8F8] p-8 rounded-lg shadow-lg mt-6">
+        <h2 className="text-2xl font-bold text-center text-[#1A1A1A] mb-6">
+          My Cart ({cartData?.length})
         </h2>
 
         {cartData?.length === 0 ? (
-          <p className="text-center text-gray-600">Your cart is empty</p>
+          <p className="text-center text-[#3D405B]">Your cart is empty</p>
         ) : (
           <>
             {/* Cart Items */}
             {cartData?.map((ele) => (
               <div
                 key={ele._id}
-                className="flex flex-col md:flex-row gap-6 border border-gray-200 rounded-lg p-4 mb-4"
+                className="flex flex-col md:flex-row gap-6 border border-[#3D405B] rounded-lg p-4 mb-4 bg-white"
               >
                 {/* Book Cover Image */}
                 <img
@@ -169,18 +93,18 @@ export default function Cart() {
 
                 {/* Book Details */}
                 <div className="flex-grow">
-                  <h2 className="text-xl font-semibold text-gray-800">
+                  <h2 className="text-xl font-semibold text-[#1A1A1A]">
                     {ele.book?.modifiedTitle}
                   </h2>
-                  <h3 className="text-gray-600">Vendor: {ele.book?.vendor}</h3>
+                  <h3 className="text-[#3D405B]">Vendor: {ele.book?.vendor.name}</h3>
 
                   {/* Rent Details */}
                   {ele.rent && (
                     <div className="mt-4 space-y-2">
-                      <h3 className="text-gray-700">
+                      <h3 className="text-[#3D405B]">
                         <span className="font-semibold">Duration:</span> {ele.rent?.period} days
                       </h3>
-                      <h3 className="text-gray-700">
+                      <h3 className="text-[#3D405B]">
                         <span className="font-semibold">Amount to Pay:</span> ₹
                         {ele.rent?.pricing.cautionDeposit +
                           ele.rent?.pricing.deliveryFee +
@@ -193,10 +117,10 @@ export default function Cart() {
                   {/* Buy Details */}
                   {ele.buy && (
                     <div className="mt-4 space-y-2">
-                      <h3 className="text-gray-700">
+                      <h3 className="text-[#3D405B]">
                         <span className="font-semibold">Sell Price:</span> ₹{ele.book?.sellPrice}
                       </h3>
-                      <h3 className="text-gray-700">
+                      <h3 className="text-[#3D405B]">
                         <span className="font-semibold">Total Amount to Pay:</span> ₹
                         {ele.book?.sellPrice + 10 + 30}
                       </h3>
@@ -206,7 +130,7 @@ export default function Cart() {
                   {/* Remove Button */}
                   <button
                     onClick={() => handleRemove(ele._id)}
-                    className="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+                    className="mt-4 bg-[#E07A5F] text-white px-4 py-2 rounded-lg hover:bg-[#D56A4F] transition-colors"
                   >
                     Remove
                   </button>
@@ -219,7 +143,7 @@ export default function Cart() {
               <div className="flex justify-end mt-6">
                 <button
                   onClick={handleClear}
-                  className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                  className="bg-[#3D405B] text-white px-6 py-2 rounded-lg hover:bg-[#2C3E50] transition-colors"
                 >
                   Clear Cart
                 </button>
@@ -232,7 +156,7 @@ export default function Cart() {
                 {cartData.some((item) => item.rent) && (
                   <button
                     onClick={handleRent}
-                    className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors"
+                    className="bg-[#3D405B] text-white px-6 py-2 rounded-lg hover:bg-[#3D405B] transition-colors"
                   >
                     Proceed to Rent
                   </button>
@@ -240,11 +164,12 @@ export default function Cart() {
                 {cartData.some((item) => item.buy) && (
                   <button
                     onClick={handleBuy}
-                    className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-colors"
+                    className="bg-[#3D405B] text-white px-6 py-2 rounded-lg hover:bg-[#3D405B] transition-colors"
                   >
                     Proceed to Buy
                   </button>
                 )}
+                
               </div>
             )}
           </>

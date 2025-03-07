@@ -203,6 +203,10 @@ app.use(passport.session());
     notifyDueDates();
 });
 
+const frontCover=[
+    {image:'https://in.pinterest.com/pin/451485931425913942/',quotes:'Reading is essential who seek to rise above the ordinary'},
+    {image:''}
+]
 
 // Routes
 app.get('/api/user/count', userCtrl.count);
@@ -237,7 +241,7 @@ app.put('/api/client/:cid/update',AuthenticateUser,AuthorizeUser(['admin']),clie
 app.get('/api/vendor/allVendors', AuthenticateUser, AuthorizeUser(['admin']), vendorCtrl.allVendors);
 app.get('/api/vendor/earnings', AuthenticateUser, AuthorizeUser(['vendor']), vendorCtrl.earnings);
 
-app.get('/api/vendor/verified',AuthenticateUser,AuthorizeUser(['admin']),vendorCtrl.verified)
+app.get('/api/vendor/verified',AuthenticateUser,AuthorizeUser(['vendor','admin']),vendorCtrl.verified)
 app.get('/api/vendor/blocked',AuthenticateUser,AuthorizeUser(['admin']),vendorCtrl.blocked)
 app.get('/api/vendor/:id', AuthenticateUser, AuthorizeUser(['admin']), vendorCtrl.oneVendor);
 app.post('/api/vendor/acceptReturn',AuthenticateUser,vendorCtrl.acceptReturn)

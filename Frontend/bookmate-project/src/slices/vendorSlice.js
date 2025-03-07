@@ -46,7 +46,9 @@ const VendorSlice=createSlice({
     },
     extraReducers:(builder)=>{
          builder.addCase(verifiedVendors.fulfilled,(state,action)=>{
+            
                     state.verified=action.payload
+                    console.log('verified',state.verified)
                 })
                 builder.addCase(verifiedVendors.rejected,(state,action)=>{
                     state.serverError=action.payload

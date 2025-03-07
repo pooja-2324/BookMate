@@ -4,7 +4,12 @@ const orderCtrl={}
 orderCtrl.myOrders=async(req,res)=>{
     try{
         const client=req.currentUser.userId
-        const orders=await Order.find({client}).populate('book').populate('rent').populate('buy').populate('client').populate('vendor')
+        const orders=await Order.find({client}).populate({
+            path:'book',
+            populate:{
+                path:'vendor'
+            }
+        }).populate('rent').populate('buy').populate('client').populate('vendor')
         if(!orders){
             return res.status(404).json({error:'orders not found'})
         }
